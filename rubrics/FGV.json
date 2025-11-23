@@ -1,8 +1,8 @@
 {
-  "name": "FGV (EAESP) — Dissertação",
-  "institution": "FGV (EAESP)",
+  "name": "FGV EAESP — Dissertação (oficial 10 pontos)",
+  "institution": "FGV EAESP",
   "banca": "FGV",
-  "version": "2025-09-08",
+  "version": "2025-11-22",
   "source_type": "oficial",
   "scale": 100,
 
@@ -10,61 +10,61 @@
     {
       "id": "nota_zero_condicoes",
       "label": "Condições de nota zero",
-      "criterion_ids": ["T", "R", "N"],
+      "criterion_ids": ["C1", "C2", "C3"],
       "type": "cap_level",
       "max_level": 0,
-      "when": "Texto em branco; fuga total ao tema; não configura dissertação; cópia extensa de coletânea/outra fonte (mais de 3 linhas).",
+      "when": "Texto em branco; fuga total ao tema; não configura dissertação; cópia extensa de coletânea ou de outra fonte (mais de 3 linhas).",
       "explanation_required": true
     },
     {
-      "id": "repertorio_obrigatorio_R",
-      "label": "Exige repertório verificável (R — Articulação e argumentação)",
-      "criterion_ids": ["R"],
+      "id": "repertorio_obrigatorio_C2",
+      "label": "Exige repertório verificável (C2 — Articulação e argumentação)",
+      "criterion_ids": ["C2"],
       "type": "cap_if_no_repertoire",
       "max_level": 2,
-      "when": "Ausência de repertório verificável além do senso comum (autores/obras, dados/estatísticas, leis, estudos, fatos históricos, casos concretos).",
+      "when": "Ausência de repertório verificável além do senso comum (autores/obras, dados/estatísticas, leis, estudos, fatos históricos, casos concretos) articulado à argumentação.",
       "explanation_required": true
     }
   ],
 
   "criteria": [
     {
-      "id": "T",
-      "name": "Adequação ao tema/estrutura",
-      "weight": 0.4,
-      "levels": {
-        "0": "Fuga total ao tema OU não configura dissertação (estrutura incompatível).",
-        "1": "Atendimento muito parcial; foco frágil; macrológica inconsistente.",
-        "2": "Atende ao tema de modo básico; estrutura dissertativa incipiente ou desigual.",
-        "3": "Boa aderência; estrutura reconhecível (introdução–desenvolvimento–conclusão) com organização suficiente.",
-        "4": "Aderência plena; estrutura consistente; recorte pertinente e sustentado.",
-        "5": "Aderência exemplar; recorte preciso e bem desenvolvido em estrutura dissertativa sólida."
-      }
-    },
-    {
-      "id": "R",
-      "name": "Articulação e argumentação",
-      "weight": 0.3,
-      "levels": {
-        "0": "Fragmentação; contradições; ausência de justificativas.",
-        "1": "Encadeamento precário; exemplos genéricos; conclusões frágeis.",
-        "2": "Argumentação básica; predominância de senso comum; pouca sustentação verificável.",
-        "3": "Boa articulação; ao menos um apoio verificável (dado/autoridade/lei/estudo/caso) relacionado e comentado.",
-        "4": "Argumentação consistente; múltiplos apoios integrados ao raciocínio; relações causais/comparativas bem exploradas.",
-        "5": "Argumentação densa e crítica; repertório variado e preciso, articulado com sofisticação (contraponto, implicações, limites)."
-      }
-    },
-    {
-      "id": "N",
-      "name": "Norma e léxico",
-      "weight": 0.3,
+      "id": "C1",
+      "name": "Domínio da norma culta (N)",
+      "weight": 0.30,
       "levels": {
         "0": "Graves inadequações de registro; múltiplos desvios que comprometem a compreensão.",
-        "1": "Muitos desvios (ortografia, acentuação, concordância, regência, pontuação).",
-        "2": "Alguns desvios; interferências pontuais na clareza; vocabulário limitado.",
-        "3": "Poucos desvios; registro globalmente adequado; vocabulário apropriado.",
-        "4": "Raros deslizes; boa precisão sintática, ortográfica e lexical.",
-        "5": "Domínio excelente do padrão escrito; clareza, precisão e propriedade estilística."
+        "1": "Muitos desvios (ortografia, acentuação, concordância, regência, pontuação); fluidez bastante prejudicada.",
+        "2": "Alguns desvios recorrentes; interferências pontuais na clareza; vocabulário limitado ou pouco preciso.",
+        "3": "Poucos desvios; registro globalmente adequado ao contexto acadêmico; vocabulário apropriado.",
+        "4": "Raros deslizes; boa precisão sintática, ortográfica e lexical; boa fluidez de leitura.",
+        "5": "Domínio excelente da norma culta; clareza, precisão e propriedade estilística, sem desvios significativos."
+      }
+    },
+    {
+      "id": "C2",
+      "name": "Articulação e argumentação (R)",
+      "weight": 0.30,
+      "levels": {
+        "0": "Fragmentação; contradições severas; ausência de justificativas; enumeração de ideias soltas.",
+        "1": "Encadeamento precário; exemplos genéricos; argumentos pouco desenvolvidos ou incoerentes.",
+        "2": "Argumentação básica, com predominância de senso comum; pouca sustentação verificável.",
+        "3": "Boa articulação; ao menos um apoio verificável (dado, autoridade, lei, estudo, caso) relacionado e comentado.",
+        "4": "Argumentação consistente; múltiplos apoios integrados ao raciocínio; relações causais/comparativas bem exploradas.",
+        "5": "Argumentação densa e crítica; repertório variado e preciso, articulado com sofisticação (contraponto, implicações, limites, desdobramentos)."
+      }
+    },
+    {
+      "id": "C3",
+      "name": "Adequação ao tema e à estrutura dissertativa (T)",
+      "weight": 0.40,
+      "levels": {
+        "0": "Fuga total ao tema OU não configura dissertação (estrutura incompatível com o gênero).",
+        "1": "Atendimento muito parcial ao tema; foco frágil; estrutura dissertativa pouco reconhecível.",
+        "2": "Atende ao tema de modo básico; há introdução, desenvolvimento e conclusão, mas com lacunas relevantes.",
+        "3": "Boa aderência ao tema; estrutura dissertativa reconhecível (introdução–desenvolvimento–conclusão) com organização suficiente.",
+        "4": "Aderência plena ao tema; estrutura consistente; recorte pertinente e sustentado ao longo do texto.",
+        "5": "Aderência exemplar; recorte preciso e bem desenvolvido em estrutura dissertativa sólida, com começo, meio e fim muito bem articulados."
       }
     }
   ]

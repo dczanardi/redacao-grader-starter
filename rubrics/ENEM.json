@@ -4,7 +4,7 @@
   "version": "2025-09-08",
   "source_type": "oficial",
   "source_pdf": "rubrics_oficiais/fontes/ENEM/ENEM_2024.pdf",
-  "scale": 100,
+  "scale": 1000,
 
   "rules": [
     {

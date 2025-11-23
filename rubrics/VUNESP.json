@@ -1,0 +1,106 @@
+{
+  "name": "UNESP — Redação (Vunesp, critérios oficiais 2025)",
+  "institution": "VUNESP",
+  "version": "2025-11-21",
+  "source_type": "oficial",
+  "source_pdf": "rubrics_oficiais/fontes/UNESP_VUNESP/UNESP_2025.pdf",
+  "scale": 100,
+
+  "rules": [
+    {
+      "id": "nota_zero_condicoes",
+      "label": "Condições de nota zero (manual Unesp/Vunesp 2025)",
+      "criterion_ids": ["C1", "C2", "C3", "C4"],
+      "type": "cap_level",
+      "max_level": 0,
+      "when": "Texto em branco; fuga total ao tema e/ou ao gênero/tipo de texto propostos; texto sob forma não articulada verbalmente (apenas desenhos, números ou palavras soltas); texto em outra língua; texto predominante ilegível; texto definitivo fora do espaço reservado; redação com 7 linhas ou menos; predominância de cópia dos textos motivadores ou de outras partes da prova/modelos prontos; identificação do candidato (nome, rubrica, assinatura, sinais); impropérios ou recusa explícita em cumprir o tema.",
+      "explanation_required": true
+    },
+    {
+      "id": "linhas_leq_15_cap_C",
+      "label": "Texto com 15 linhas ou menos (critério C — Língua)",
+      "criterion_ids": ["C3"],
+      "type": "cap_if_line_count_at_most",
+      "line_threshold": 15,
+      "max_level": 3,
+      "when": "Redações com 15 linhas ou menos perdem um ponto no critério C (Língua/expressão) e não atingem o nível máximo.",
+      "explanation_required": true
+    },
+    {
+      "id": "linhas_leq_20_cap_C",
+      "label": "Texto com 20 linhas ou menos (critério C — Língua)",
+      "criterion_ids": ["C3"],
+      "type": "cap_if_line_count_at_most",
+      "line_threshold": 20,
+      "max_level": 4,
+      "when": "Redações com 20 linhas ou menos não podem alcançar a nota máxima no critério C (Língua/expressão).",
+      "explanation_required": true
+    },
+    {
+      "id": "repertorio_obrigatorio_B",
+      "label": "Repertório verificável (critério B — Estrutura/coerência global)",
+      "criterion_ids": ["C2"],
+      "type": "cap_if_no_repertoire",
+      "max_level": 2,
+      "when": "Ausência de repertório verificável além do senso comum (autores/obras, dados/estatísticas, leis, estudos, fatos históricos, casos concretos) articulado de forma coerente ao ponto de vista do candidato.",
+      "explanation_required": true
+    }
+  ],
+
+  "criteria": [
+    {
+      "id": "C1",
+      "name": "A — Tema",
+      "weight": 0.25,
+      "levels": {
+        "0": "Fuga total ao tema proposto ou não realização da proposta.",
+        "1": "Atendimento muito parcial ao tema; foco frágil; abordagem pouco pertinente.",
+        "2": "Atende basicamente ao tema proposto, mas com formulação genérica e eventuais desvios.",
+        "3": "Boa compreensão do tema; atende às tarefas da proposta com pertinência global.",
+        "4": "Atendimento pleno ao tema; abordagem consistente e relevante ao recorte proposto.",
+        "5": "Atendimento exemplar ao tema; recorte preciso e aprofundado, com leitura crítica dos motivadores (quando houver)."
+      }
+    },
+    {
+      "id": "C2",
+      "name": "B — Estrutura (gênero/tipo de texto e coerência global)",
+      "weight": 0.25,
+      "levels": {
+        "0": "Não configura o gênero/tipo de texto solicitado; ausência de estrutura reconhecível.",
+        "1": "Estrutura muito frágil; partes ausentes ou mal definidas; propósito pouco claro.",
+        "2": "Estrutura básica com lacunas; predominância de senso comum; pouca sustentação verificável.",
+        "3": "Estrutura adequada; organização reconhecível (introdução, desenvolvimento e conclusão); ao menos um apoio verificável (dado, autor, lei, estudo, fato, caso) relacionado e comentado; posicionamento globalmente claro.",
+        "4": "Estrutura consistente; desenvolvimento articulado do ponto de vista; repertório bem integrado ao raciocínio; texto com boa autonomia em relação à coletânea.",
+        "5": "Estrutura exemplar; progressão sólida da tese; uso crítico e pertinente de repertório variado; interlocução objetiva e adequada ao gênero dissertativo-argumentativo."
+      }
+    },
+    {
+      "id": "C3",
+      "name": "C — Língua (modalidade escrita e registro formal)",
+      "weight": 0.25,
+      "levels": {
+        "0": "Graves inadequações à modalidade escrita ou ao registro formal; múltiplos desvios que comprometem a compreensão.",
+        "1": "Muitos desvios gramaticais e de convenção da escrita (ortografia, acentuação, concordância, pontuação etc.); escolha lexical pouco precisa.",
+        "2": "Alguns desvios recorrentes, com interferências pontuais na clareza; vocabulário simples ou pouco variado.",
+        "3": "Poucos desvios; registro globalmente adequado à norma-padrão; vocabulário apropriado.",
+        "4": "Raros deslizes; boa precisão sintática, ortográfica e lexical; registro formal consistente.",
+        "5": "Domínio excelente da modalidade escrita e do registro formal; clareza, correção e propriedade estilística."
+      }
+    },
+    {
+      "id": "C4",
+      "name": "D — Coesão (mecanismos coesivos)",
+      "weight": 0.25,
+      "levels": {
+        "0": "Emprego muito deficiente de recursos coesivos; quebras graves entre frases ou parágrafos; dificuldade de acompanhar o texto.",
+        "1": "Coesão frágil; conectores pouco adequados; retomadas imprecisas; relação pouco clara entre partes do texto.",
+        "2": "Coesão básica; uso funcional, ainda que limitado, de pronomes, conectores e outras marcas de coesão; eventuais quebras.",
+        "3": "Boa coesão; conectores e retomadas adequados; paragrafação funcional; relação clara entre períodos e parágrafos.",
+        "4": "Coesão consistente; articulação clara e fluida entre ideias, períodos e parágrafos; boa variedade de mecanismos coesivos.",
+        "5": "Coesão exemplar; encadeamento refinado; uso preciso e variado de anáforas, catáforas, substituições, elipses e conjunções, garantindo alta legibilidade."
+      }
+    }
+  ],
+
+  "notes": "Critérios A, B, C e D alinhados ao Manual do Candidato Unesp 2025 (Vunesp). Pesos iguais (25% cada) e níveis 0–5 são escolhas operacionais desta ferramenta, não divulgadas oficialmente pela banca."
+}

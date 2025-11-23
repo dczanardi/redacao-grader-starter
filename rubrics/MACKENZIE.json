@@ -1,8 +1,8 @@
 {
   "name": "MACKENZIE — Dissertativo-argumentativo (operacional 2025)",
   "institution": "MACKENZIE",
-  "version": "2025-09-08",
-  "source_type": "operacional",
+  "version": "2025-11-22",
+  "source_type": "operacional_alinhado_editais",
   "source_pdf": "rubrics_oficiais/fontes/MACKENZIE/MACKENZIE_2025.pdf",
   "scale": 100,
 
@@ -13,16 +13,16 @@
       "criterion_ids": ["C1", "C2", "C3", "C4"],
       "type": "cap_level",
       "max_level": 0,
-      "when": "Texto em branco; fuga total ao tema; gênero inadequado (não dissertativo-argumentativo); cópia extensa (mais de 3 linhas) da coletânea ou de outra fonte.",
+      "when": "Texto em branco; fuga total ao tema; tipo de texto inadequado (não dissertativo-argumentativo); cópia extensa (mais de 3 linhas) da coletânea ou de outra fonte; desrespeito às regras básicas do edital (como quantidade mínima de linhas).",
       "explanation_required": true
     },
     {
       "id": "repertorio_obrigatorio_C2",
-      "label": "Exige repertório verificável (C2 — Argumentação)",
+      "label": "Repertório verificável na argumentação (C2)",
       "criterion_ids": ["C2"],
       "type": "cap_if_no_repertoire",
       "max_level": 2,
-      "when": "Ausência de repertório verificável além do senso comum (autores/obras, dados/estatísticas, leis, estudos, fatos históricos, casos concretos).",
+      "when": "Argumentação baseada quase exclusivamente em senso comum, sem uso de exemplos, dados, autores, leis, obras, fatos históricos ou estudos reconhecíveis.",
       "explanation_required": true
     }
   ],
@@ -30,57 +30,57 @@
   "criteria": [
     {
       "id": "C1",
-      "name": "Tema/Proposta",
+      "name": "Tema e proposta (recorte + atendimento às instruções)",
       "weight": 0.25,
       "levels": {
-        "0": "Fuga total ao tema ou não realização da proposta.",
-        "1": "Atendimento muito parcial; foco frágil; leitura superficial da proposta.",
-        "2": "Atende de forma básica; delimitação genérica ou pouco pertinente.",
-        "3": "Boa aderência; recorte pertinente e objetivos claros.",
-        "4": "Aderência plena; problematização consistente e bem delimitada.",
-        "5": "Aderência exemplar; recorte preciso e aprofundado do tema."
+        "0": "Fuga total ao tema ou não realização da proposta (desconsidera textos motivadores e instruções centrais).",
+        "1": "Atendimento muito parcial; foco frágil; recorte pouco relacionado à proposta.",
+        "2": "Atende de forma básica; recorte genérico; nem todas as instruções são contempladas.",
+        "3": "Boa aderência; recorte pertinente; respeita a proposta e os textos motivadores.",
+        "4": "Aderência plena; problematização consistente; recorte bem delimitado.",
+        "5": "Aderência exemplar; recorte preciso e aprofundado; demonstra leitura crítica dos motivadores."
       }
     },
     {
       "id": "C2",
-      "name": "Argumentação",
+      "name": "Argumentação e coerência global",
       "weight": 0.25,
       "levels": {
-        "0": "Fragmentação; contradições; ausência de justificativas.",
-        "1": "Encadeamento precário; exemplos genéricos; conclusões frágeis.",
-        "2": "Argumentação básica; predominância de senso comum; pouca sustentação verificável.",
-        "3": "Boa articulação; ao menos um apoio verificável (dado/autoridade/lei/estudo/caso) relacionado e comentado.",
-        "4": "Argumentação consistente; múltiplos apoios integrados; relações causais/comparativas bem exploradas.",
-        "5": "Argumentação densa e crítica; repertório variado e preciso, articulado com sofisticação (contraponto, implicações, limites)."
+        "0": "Ausência de ponto de vista sustentado; ideias desconexas; contradições graves.",
+        "1": "Tese pouco clara; argumentos frágeis e genéricos; conclusões pouco relacionadas ao desenvolvimento.",
+        "2": "Argumentação básica, previsível; há linha de raciocínio, mas com pouca exploração e quase nenhum apoio verificável.",
+        "3": "Coerência global adequada; tese clara; ao menos um apoio verificável (dado, exemplo concreto, referência a autor, lei ou obra) relacionado e comentado.",
+        "4": "Argumentação consistente; múltiplos apoios bem integrados; explora causas, consequências e contrapontos de modo organizado.",
+        "5": "Argumentação densa e crítica; repertório variado e preciso; discute implicações, limites e perspectivas do tema com maturidade."
       }
     },
     {
       "id": "C3",
-      "name": "Estrutura/Coesão",
+      "name": "Coesão e estrutura (organização do texto)",
       "weight": 0.25,
       "levels": {
-        "0": "Sem estrutura reconhecível; progressão e paragrafação comprometidas.",
-        "1": "Estrutura muito frágil; partes ausentes ou mal definidas; coesão precária.",
-        "2": "Estrutura básica com lacunas; coesão simples; paragrafação irregular.",
-        "3": "Estrutura adequada; progressão clara; coesão e paragrafação funcionais.",
-        "4": "Estrutura consistente; transições e encadeamento claros entre ideias e parágrafos.",
-        "5": "Estrutura exemplar; coesão refinada; organização estratégica do texto."
+        "0": "Sem estrutura reconhecível (parágrafos inexistentes ou caóticos); progressão comprometida.",
+        "1": "Estrutura muito frágil; introdução, desenvolvimento e conclusão pouco diferenciados; coesão precária.",
+        "2": "Estrutura básica, com introdução, desenvolvimento e conclusão identificáveis, porém com transições pobres e paragrafação irregular.",
+        "3": "Estrutura adequada; progressão clara de ideias; paragrafação funcional; uso suficiente de conectores.",
+        "4": "Estrutura consistente; transições bem marcadas; uso variado e adequado de mecanismos coesivos.",
+        "5": "Estrutura exemplar; organização estratégica dos parágrafos a serviço da tese; coesão refinada em nível micro e macrotextual."
       }
     },
     {
       "id": "C4",
-      "name": "Expressão/Norma-padrão",
+      "name": "Norma-padrão e expressão escrita",
       "weight": 0.25,
       "levels": {
-        "0": "Graves inadequações de registro; múltiplos desvios que comprometem a compreensão.",
-        "1": "Muitos desvios (ortografia, acentuação, concordância, pontuação) e marcas de oralidade.",
-        "2": "Alguns desvios; interferências pontuais na clareza; vocabulário limitado.",
-        "3": "Poucos desvios; registro globalmente adequado; vocabulário apropriado.",
-        "4": "Raros deslizes; boa precisão sintática, ortográfica e lexical.",
-        "5": "Domínio excelente do padrão escrito; clareza, precisão e propriedade estilística."
+        "0": "Graves inadequações de registro; múltiplos desvios de ortografia, flexão, pontuação e concordância que comprometem a compreensão.",
+        "1": "Muitos desvios de norma-padrão e forte interferência de oralidade; leitura bastante prejudicada.",
+        "2": "Alguns desvios recorrentes; prejuízos pontuais à clareza; vocabulário pouco variado.",
+        "3": "Poucos desvios; registro globalmente adequado; vocabulário apropriado ao contexto formal.",
+        "4": "Raros deslizes; boa precisão sintática, ortográfica e lexical; fraseado claro e fluente.",
+        "5": "Domínio excelente da norma-padrão escrita; correção e clareza acompanhadas de boa apuração vocabular e estilo compatível com o vestibular."
       }
     }
   ],
 
-  "notes": "Operacional; edital não publica grade numérica."
+  "notes": "Rúbrica operacional alinhada aos eixos descritos nos materiais de preparação do Mackenzie (tema/proposta, argumentação/coerência, coesão/estrutura e correção linguística), com pesos iguais entre os quatro critérios."
 }

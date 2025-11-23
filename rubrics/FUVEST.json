@@ -1,28 +1,19 @@
 {
-  "name": "FUVEST — Dissertativo-argumentativo (operacional 2025)",
+  "name": "FUVEST (oficial — 4 quesitos, pesos 3-2-3-2)",
   "institution": "FUVEST",
-  "version": "2025-09-08",
-  "source_type": "operacional",
+  "version": "2025-11-20",
+  "source_type": "oficial",
   "source_pdf": "rubrics_oficiais/fontes/FUVEST/FUVEST_2025.pdf",
   "scale": 100,
 
   "rules": [
     {
       "id": "nota_zero_condicoes",
-      "label": "Condições de nota zero",
+      "label": "Condições de nota zero (todas as propostas)",
       "criterion_ids": ["C1", "C2", "C3", "C4"],
       "type": "cap_level",
       "max_level": 0,
-      "when": "Texto em branco; fuga total ao tema; gênero inadequado (não dissertativo-argumentativo); cópia extensa (mais de 3 linhas) da coletânea ou de outra fonte.",
-      "explanation_required": true
-    },
-    {
-      "id": "repertorio_obrigatorio_C3",
-      "label": "Exige autoria e repertório verificável (C3)",
-      "criterion_ids": ["C3"],
-      "type": "cap_if_no_repertoire",
-      "max_level": 2,
-      "when": "Ausência de autoria e repertório verificável além do senso comum/colagem da coletânea (autores/obras, dados/leis/estudos, fatos históricos, casos concretos).",
+      "when": "Não desenvolvimento do tema proposto; não atendimento ao gênero ou tipo de texto solicitado; cópia integral da coletânea; qualquer forma de identificação do(a) candidato(a) no texto.",
       "explanation_required": true
     }
   ],
@@ -30,57 +21,57 @@
   "criteria": [
     {
       "id": "C1",
-      "name": "Tema/Abordagem (aderência; leitura dos motivadores)",
-      "weight": 0.40,
+      "name": "Desenvolvimento do tema, uso da coletânea e autoria (peso 3)",
+      "weight": 0.30,
       "levels": {
-        "0": "Fuga total ao tema OU não realiza a proposta.",
-        "1": "Tangencia o tema; leitura pouco pertinente dos motivadores; foco frágil.",
-        "2": "Compreensão básica; leitura superficial dos motivadores; recorte genérico.",
-        "3": "Boa aderência; dialoga com os motivadores sem colagem; recorte pertinente.",
-        "4": "Aderência plena; problematização consistente; uso crítico dos motivadores.",
-        "5": "Abordagem exemplar; leitura crítica e autônoma dos motivadores; recorte preciso e aprofundado."
+        "0": "Quase não desenvolve o tema; copia trechos da coletânea ou apenas a parafraseia; ausência de autoria.",
+        "1": "Desenvolvimento tangencial do tema; uso muito colado à coletânea; poucos sinais de autoria.",
+        "2": "Desenvolvimento ainda limitado, mas já se afasta parcialmente da coletânea; indícios discretos de autoria.",
+        "3": "Desenvolvimento razoável do tema; apropriação superficial porém correta da coletânea; mobiliza conhecimentos próprios.",
+        "4": "Bom desenvolvimento do tema; uso consistente da coletânea articulado a repertório próprio; autoria clara.",
+        "5": "Desenvolvimento excelente; leitura crítica da coletânea, uso autoral e criativo de referências; autoria muito marcada."
       }
     },
     {
       "id": "C2",
-      "name": "Estrutura e Coesão (introdução, desenvolvimento, conclusão; encadeamento)",
-      "weight": 0.30,
+      "name": "Compreensão e atendimento ao gênero e tipo de texto (peso 2)",
+      "weight": 0.20,
       "levels": {
-        "0": "Sem estrutura reconhecível; fragmentação e contradições.",
-        "1": "Estrutura muito frágil; partes ausentes ou mal definidas; encadeamento precário.",
-        "2": "Estrutura básica (IDC) com lacunas; coesão simples; paragrafação irregular.",
-        "3": "Estrutura adequada; progressão clara; coesão e paragrafação funcionais.",
-        "4": "Estrutura consistente; encadeamento claro entre parágrafos e ideias.",
-        "5": "Estrutura exemplar; progressão, transições e coesão refinadas."
+        "0": "Configuração muito distante do gênero/tipo exigido; estrutura praticamente inadequada.",
+        "1": "Atendimento primário ao gênero e/ou tipo; marcas estruturais aparecem de forma frágil ou incompleta.",
+        "2": "Atendimento ainda irregular, mas reconhecível; alguns elementos do gênero/tipo são bem realizados, outros não.",
+        "3": "Atendimento razoável; gênero e tipo são identificáveis, com estrutura básica adequada.",
+        "4": "Atendimento bom ao gênero e ao tipo; estrutura composicional sólida e coerente com a proposta.",
+        "5": "Atendimento exemplar; domina o gênero e o tipo de texto, explorando com segurança seus recursos composicionais."
       }
     },
     {
       "id": "C3",
-      "name": "Autoria & Uso crítico da coletânea (posicionamento próprio)",
-      "weight": 0.15,
+      "name": "Recursos linguísticos, coesão e progressão textual (peso 3)",
+      "weight": 0.30,
       "levels": {
-        "0": "Sem autoria; reprodução/colagem da coletânea ou senso comum.",
-        "1": "Autoria muito limitada; exemplos genéricos; dependência forte dos motivadores.",
-        "2": "Autoria básica; alguma iniciativa própria; repertório pouco verificável.",
-        "3": "Autoria reconhecível; pelo menos um apoio verificável (dado/autor/lei/estudo/caso) relacionado e comentado.",
-        "4": "Autoria consistente; repertório múltiplo/qualificado, integrado ao raciocínio; leitura crítica dos motivadores.",
-        "5": "Autoria destacada; repertório variado e preciso; elaboração crítica sofisticada a partir dos motivadores."
+        "0": "Fragmentação forte; sequência de ideias pouco clara; muitos problemas de coesão e de organização global.",
+        "1": "Articulação razoável, mas com várias falhas na composição; progressão temática instável.",
+        "2": "Articulação mediana; já há início, meio e fim identificáveis, mas com quebras ou repetições excessivas.",
+        "3": "Boa articulação formal e de sentido; composição textual adequada, com progressão relativamente fluida.",
+        "4": "Articulação consistente; coesão bem construída entre parágrafos e ideias; progressão segura.",
+        "5": "Ótima articulação formal e de sentido; projeto de composição muito claro, com progressão sofisticada e bem planejada."
       }
     },
     {
       "id": "C4",
-      "name": "Expressão & Norma-padrão (clareza; correção)",
-      "weight": 0.15,
+      "name": "Convenções da escrita e adequação vocabular (peso 2)",
+      "weight": 0.20,
       "levels": {
-        "0": "Graves inadequações de registro; múltiplos desvios que comprometem a compreensão.",
-        "1": "Muitos desvios (ortografia, acentuação, concordância, pontuação) e marcas de oralidade.",
-        "2": "Alguns desvios; interferências pontuais na clareza; vocabulário limitado.",
-        "3": "Poucos desvios; registro globalmente adequado; vocabulário apropriado.",
-        "4": "Raros deslizes; boa precisão sintática, ortográfica e lexical.",
-        "5": "Domínio excelente do padrão escrito; clareza, precisão e propriedade estilística."
+        "0": "Muitos desvios graves de norma-padrão e vocabulário pouco adequado, comprometendo a compreensão.",
+        "1": "Rompe com frequência convenções da escrita, mas revela algum domínio da norma-padrão e dos recursos gramaticais.",
+        "2": "Rompe ocasionalmente convenções da escrita; domínio globalmente bom da norma-padrão e do vocabulário.",
+        "3": "Rompe poucas vezes convenções da escrita; domínio muito bom da norma-padrão e da seleção vocabular.",
+        "4": "Raros deslizes; domínio sólido das convenções de escrita e uso preciso do vocabulário.",
+        "5": "Uso exemplar da norma-padrão e do vocabulário; altíssima correção e precisão expressiva sem soar artificial."
       }
     }
   ],
 
-  "notes": "Pesos definidos: C1 40%, C2 30%, C3 15%, C4 15%."
+  "notes": "Baseado na matriz oficial de critérios para redação FUVEST (Simulado 2025), com pesos 3-2-3-2 e adaptação para escala de 0 a 5 níveis por quesito a fim de permitir maior nuance na correção automática."
 }

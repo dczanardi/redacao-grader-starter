@@ -1,9 +1,9 @@
 {
-  "name": "UNICAMP — Produção textual (operacional 2025)",
+  "name": "UNICAMP — Redação (oficial — Pt, G, Lt, CeC 2026)",
   "institution": "UNICAMP",
-  "version": "2025-09-08",
-  "source_type": "operacional",
-  "source_pdf": "rubrics_oficiais/fontes/UNICAMP/UNICAMP_2025.pdf",
+  "version": "2026-01-01",
+  "source_type": "oficial_adaptado",
+  "source_pdf": "Diretrizes-de-Avaliacao-da-Redacao-site.pdf",
   "scale": 100,
 
   "rules": [
@@ -13,16 +13,7 @@
       "criterion_ids": ["C1", "C2", "C3", "C4"],
       "type": "cap_level",
       "max_level": 0,
-      "when": "Texto em branco; fuga total ao tema/proposta; gênero/formato inadequado conforme enunciado; cópia extensa (mais de 3 linhas) da coletânea ou de outra fonte.",
-      "explanation_required": true
-    },
-    {
-      "id": "repertorio_obrigatorio_C2",
-      "label": "Exige repertório verificável (C2 — Propósito/Argumentação)",
-      "criterion_ids": ["C2"],
-      "type": "cap_if_no_repertoire",
-      "max_level": 2,
-      "when": "Ausência de repertório verificável além do senso comum (autores/obras, dados/estatísticas, leis, estudos, fatos históricos, casos concretos) articulado ao propósito.",
+      "when": "Texto em branco; fuga total à proposta temática; gênero/formato incompatível com o solicitado; texto predominantemente copiado dos textos motivadores ou de outra fonte.",
       "explanation_required": true
     }
   ],
@@ -30,57 +21,55 @@
   "criteria": [
     {
       "id": "C1",
-      "name": "Adequação ao Gênero e Interlocução (conforme proposta)",
-      "weight": 0.25,
+      "name": "Proposta temática (Pt — atendimento ao tema e à tarefa)",
+      "weight": 0.17,
       "levels": {
-        "0": "Não atende ao gênero/interlocução solicitados ou não realiza a proposta.",
-        "1": "Atendimento muito parcial; interlocução e convenções de gênero frágeis.",
-        "2": "Atendimento básico; traços de gênero reconhecíveis com lacunas.",
-        "3": "Boa adequação; interlocução clara e convenções de gênero atendidas.",
-        "4": "Adequação plena; escolhas discursivas consistentes ao gênero e ao leitor-alvo.",
-        "5": "Adequação exemplar; domínio do gênero e da interlocução com sofisticação."
+        "0": "Não realiza a proposta temática: fuga total ao tema ou tarefa não cumprida.",
+        "1": "Atende de forma muito parcial; foco pouco claro; aborda aspectos periféricos do tema.",
+        "2": "Atendimento básico; o tema é reconhecível, mas com recorte genérico ou pouco preciso.",
+        "3": "Boa realização da proposta temática; recorte pertinente e foco relativamente claro.",
+        "4": "Realização plena da proposta; recorte bem definido e consistente ao longo do texto.",
+        "5": "Tratamento exemplar da proposta temática; recorte preciso, pertinente e explorado de modo aprofundado."
       }
     },
     {
       "id": "C2",
-      "name": "Propósito/Argumentação (alvo comunicativo; consistência)",
+      "name": "Gênero (G — atendimento ao gênero e à interlocução previstos)",
       "weight": 0.25,
       "levels": {
-        "0": "Propósito ausente/incoerente; contradições severas; ausência de justificativas.",
-        "1": "Propósito pouco definido; sustentação frágil; exemplos genéricos.",
-        "2": "Propósito básico; argumentação previsível; pouca sustentação verificável.",
-        "3": "Propósito claro; ao menos um apoio verificável (dado/autor/lei/estudo/caso) relacionado e comentado.",
-        "4": "Propósito bem desenvolvido; múltiplos apoios integrados ao raciocínio.",
-        "5": "Propósito exemplar; argumentação densa e crítica; repertório variado e preciso, articulado com sofisticação."
+        "0": "Não atende ao gênero solicitado ou compromete totalmente a situação de interlocução.",
+        "1": "Marcas de gênero muito frágeis; elementos centrais do gênero pouco reconhecíveis.",
+        "2": "Gênero reconhecível, mas com lacunas importantes (estrutura, voz enunciativa, propósito comunicativo).",
+        "3": "Boa adequação ao gênero; estrutura compatível, voz enunciativa e interlocução atendidas.",
+        "4": "Adequação plena; escolhas discursivas consistentes com o gênero e o público-alvo.",
+        "5": "Domínio exemplar do gênero e da interlocução; utiliza recursos próprios do gênero com segurança e sofisticação."
       }
     },
     {
       "id": "C3",
-      "name": "Articulação e Coesão (progressão; referências; paragrafação)",
+      "name": "Leitura do(s) texto(s) (Lt — uso dos textos motivadores e outras referências)",
       "weight": 0.25,
       "levels": {
-        "0": "Fragmentação; ausência de progressão; referenciação deficiente.",
-        "1": "Encadeamento precário; conectores inadequados; retomadas imprecisas.",
-        "2": "Encadeamento básico; conectores funcionais; paragrafação simples.",
-        "3": "Boa progressão; referenciação adequada; paragrafação funcional.",
-        "4": "Coesão consistente; transições e encadeamento claros entre ideias e parágrafos.",
-        "5": "Coesão exemplar; encadeamento refinado; uso preciso e variado de mecanismos coesivos."
+        "0": "Não estabelece relação significativa com os textos motivadores; leitura equivocada ou ausente.",
+        "1": "Relações superficiais; menções genéricas aos textos, sem integração ao ponto de vista do candidato.",
+        "2": "Leitura básica; identifica ideias dos textos, mas com pouca elaboração ou comentário próprio.",
+        "3": "Boa leitura; mobiliza adequadamente ideias dos textos motivadores e as relaciona ao ponto de vista.",
+        "4": "Leitura consistente; articula criticamente as ideias dos textos motivadores e de outros repertórios.",
+        "5": "Leitura exemplar; integra de forma crítica e autônoma os textos motivadores e outros repertórios, sustentando o ponto de vista com sofisticação."
       }
     },
     {
       "id": "C4",
-      "name": "Expressão/Norma-padrão (clareza; correção; registro)",
-      "weight": 0.25,
+      "name": "Convenções da escrita e coesão (CeC — correção e organização linguística)",
+      "weight": 0.33,
       "levels": {
-        "0": "Graves inadequações de registro; múltiplos desvios que comprometem a compreensão.",
-        "1": "Muitos desvios (ortografia, acentuação, concordância, pontuação) e marcas de oralidade.",
-        "2": "Alguns desvios; interferências pontuais na clareza; vocabulário limitado.",
-        "3": "Poucos desvios; registro globalmente adequado; vocabulário apropriado.",
-        "4": "Raros deslizes; boa precisão sintática, ortográfica e lexical.",
-        "5": "Domínio excelente do padrão escrito; clareza, precisão e propriedade estilística."
+        "0": "Graves problemas de correção e organização; comprometem seriamente a compreensão global do texto.",
+        "1": "Muitos desvios de norma-padrão e coesão; períodos confusos; paragrafação precária.",
+        "2": "Alguns desvios recorrentes de grafia, concordância ou pontuação; coesão básica e às vezes truncada.",
+        "3": "Correção globalmente adequada; poucos desvios que não impedem a compreensão; coesão e paragrafação funcionais.",
+        "4": "Boa correção; raros deslizes; coesão consistente entre períodos e parágrafos; progressão clara.",
+        "5": "Domínio excelente das convenções da escrita e da coesão; texto claro, fluente e bem organizado, com uso preciso de recursos linguísticos."
       }
     }
-  ],
-
-  "notes": "Gêneros variáveis — validar sempre o gênero/interlocução pedidos no enunciado."
+  ]
 }

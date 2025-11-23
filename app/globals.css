@@ -1,2 +1,12 @@
-html,body{margin:0;padding:0}
-*{box-sizing:border-box}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #FFE0E0 !important; /* COR DE TESTE, bem visível */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}

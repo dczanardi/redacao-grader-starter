@@ -15,9 +15,9 @@ import crypto from "crypto";
 console.log("[grade2] route module loaded");
 
 // ====== CONFIGS ======
-const LEVEL_MAP = [0.1, 0.3, 0.5, 0.7, 0.9, 1.0]; // N0..N5
+const LEVEL_MAP = [0.0, 0.3, 0.5, 0.7, 0.9, 1.0]; // N0..N5 (agora nível 0 = 0.0)
 const RUBRICS_DIR = path.join(process.cwd(), "rubrics");
-const FUVEST_WEIGHTS: Record<string, number> = { C1: 0.40, C2: 0.30, C3: 0.15, C4: 0.15 };
+const FUVEST_WEIGHTS: Record<string, number> = { C1: 0.30, C2: 0.20, C3: 0.30, C4: 0.20 };
 
 // Cache DEV
 const CACHE_FILE = path.join(process.cwd(), ".cache", "grades.json");
@@ -76,7 +76,7 @@ function softenStudentFacing(text: string): string {
 async function loadRubricFile(rubricNameRaw: string) {
   const safe = rubricNameRaw
     .replace(/\s*\((oficial|operacional)\)\s*/ig, "")
-    .replace(/\bVUNESP\b/ig, "UNESP");
+    .trim(); // não troca mais VUNESP por UNESP
 
   const files = await fs.readdir(RUBRICS_DIR);
   const fileName = files.find(f => f.replace(/\.json$/i, "").toLowerCase() === safe.toLowerCase());
@@ -347,6 +347,7 @@ function detectRepertoire(essay: string, proposal?: string): Detected {
 // ====== HTML DO RELATÓRIO ======
 function humanRuleId(id: string) {
   if (/repertorio/i.test(id)) return "Repertório obrigatório";
+  if (/no_common_sense/i.test(id)) return "Repertório insuficiente / senso comum";
   return id;
 }
 
@@ -376,6 +377,15 @@ function buildReportHTML({ rubric, result, essayText }: any) {
          <ul>${result.triggered_rules.map((r:any)=>`<li><b>${humanRuleId(S(r.id))}</b> → [${(r.criterion_ids||[]).join(", ")}]: ${softenStudentFacing(S(r.reason))}</li>`).join("")}</ul>
        </details>` : "";
 
+       const rubricLabel = (rubric.institution || rubric.name || "").toUpperCase();
+const isEnem = rubricLabel.includes("ENEM");
+
+// total continua 0–100 por dentro
+const rawTotal = total ?? 0;
+
+// para ENEM mostramos 0–1000; para o resto, 0–100
+const totalDisplay = isEnem ? Math.round(rawTotal * 10) : Math.round(rawTotal);
+const totalScaleLabel = isEnem ? "0–1000" : "0–100";
   const html = `<!doctype html>
 <html lang="pt-br">
 <head>
@@ -394,8 +404,7 @@ function buildReportHTML({ rubric, result, essayText }: any) {
 </style>
 </head>
 <body>
-  <h2>Nota (0–100): ${total.toFixed(0)} <span class="badge">${rubric.name}</span></h2>
-
+  <h2>Nota (${totalScaleLabel}): ${totalDisplay} <span class="badge">${rubric.name}</span></h2>
   <details open>
     <summary><b>Critérios</b></summary>
     <table>
@@ -483,35 +492,49 @@ export async function POST(req: Request) {
       essayText,
     });
 
-    // ====== PARA-CHOQUE: CAP SE NÃO HÁ REPERTÓRIO ======
-    const det = detectRepertoire(essayText, prop.text);
-    let autoTriggered = false;
+// ====== PARA-CHOQUE: CAP SE NÃO HÁ REPERTÓRIO ======
+const det = detectRepertoire(essayText, prop.text);
+let autoTriggered = false;
 
-    if (!det.has) {
-      const c2 = result.criteria.find((c:any) => c.id.toUpperCase() === "C2" || /argumenta/i.test(c.name));
-      if (c2 && c2.level > 2) {
-        c2.level = 2;
-        c2.just = softenStudentFacing(`Faltou repertório verificável; por isso, este critério foi limitado ao nível 2. ${c2.just}`);
-        autoTriggered = true;
-      }
-      const c1 = result.criteria.find((c:any) => c.id.toUpperCase() === "C1" || /tema|gênero|genero/i.test(c.name));
-      if (c1 && c1.level > 3) {
-        c1.level = 3;
-        c1.just = softenStudentFacing(`Faltou repertório verificável; por isso, este critério foi avaliado até o nível 3. ${c1.just}`);
-        autoTriggered = true;
-      }
+if (!det.has) {
+  const c2 = result.criteria.find(
+    (c:any) => c.id.toUpperCase() === "C2" || /argumenta/i.test(c.name)
+  );
+  if (c2 && c2.level > 2) {
+    c2.level = 2;
+    const nivelCapC2 = LEVEL_MAP[2]; // 0.5
+    const nivelCapC2Label = nivelCapC2.toFixed(1).replace(".", ",");
+    c2.just = softenStudentFacing(
+      `Faltou repertório verificável; por isso, este critério foi limitado ao nível ${nivelCapC2Label}. ${c2.just}`
+    );
+    autoTriggered = true;
+  }
 
-      if (autoTriggered) {
-        result.triggered_rules = result.triggered_rules || [];
-        result.triggered_rules.push({
-          id: "repertorio_obrigatorio_auto",
-          criterion_ids: [ result.criteria.find((c:any)=>c.id.toUpperCase()==="C1")?.id || "C1",
-                           result.criteria.find((c:any)=>c.id.toUpperCase()==="C2")?.id || "C2" ],
-          reason: det.reason
-        });
-      }
-    }
+  const c1 = result.criteria.find(
+    (c:any) => c.id.toUpperCase() === "C1" || /tema|gênero|genero/i.test(c.name)
+  );
+  if (c1 && c1.level > 3) {
+    c1.level = 3;
+    const nivelCapC1 = LEVEL_MAP[3]; // 0.7
+    const nivelCapC1Label = nivelCapC1.toFixed(1).replace(".", ",");
+    c1.just = softenStudentFacing(
+      `Faltou repertório verificável; por isso, este critério foi avaliado até o nível ${nivelCapC1Label}. ${c1.just}`
+    );
+    autoTriggered = true;
+  }
 
+  if (autoTriggered) {
+    result.triggered_rules = result.triggered_rules || [];
+    result.triggered_rules.push({
+      id: "repertorio_obrigatorio_auto",
+      criterion_ids: [
+        result.criteria.find((c:any)=>c.id.toUpperCase()==="C1")?.id || "C1",
+        result.criteria.find((c:any)=>c.id.toUpperCase()==="C2")?.id || "C2"
+      ],
+      reason: det.reason
+    });
+  }
+}
     // ====== RELATÓRIO ======
     const outData = buildReportHTML({ rubric, result, essayText });
     const response = {

@@ -473,16 +473,28 @@ export async function POST(req: Request) {
     const essayText = normalizeEssayText(S(form.get("essay_text_override") || form.get("essay_text") || ""));
     if (!essayText) throw new Error("Cole o texto da redação (campo obrigatório).");
 
-    // ====== CACHE DEV ======
-    const payloadForHash = {
-      rubric, proposalText: prop.text || "", proposalImage: !!prop.imageDataUrl,
-      essayText, levelMap: LEVEL_MAP, model: process.env.ESSAY_MODEL || process.env.OCR_MODEL_PRIMARY || "gpt-5",
-      version: "v3.2-soft-student"
-    };
-    const key = cacheKey(payloadForHash);
-    await ensureCacheDir();
-    let cache = await loadCache();
-    if (cache[key]) return NextResponse.json(cache[key]);
+// ====== CACHE DEV ======
+const modelUsed =
+  process.env.ESSAY_MODEL ||
+  process.env.OCR_MODEL_PRIMARY ||
+  "gpt-5";
+
+const payloadForHash = {
+  rubric,
+  proposalText: prop.text || "",
+  proposalImage: !!prop.imageDataUrl,
+  essayText,
+  levelMap: LEVEL_MAP,
+  model: modelUsed,
+  version: "v3.2-soft-student",
+};
+
+console.log("[grade2] usando modelo:", modelUsed);
+
+const key = cacheKey(payloadForHash);
+await ensureCacheDir();
+let cache = await loadCache();
+if (cache[key]) return NextResponse.json(cache[key]);
 
     // ====== AVALIAÇÃO ======
     const result = await callModelStrict({

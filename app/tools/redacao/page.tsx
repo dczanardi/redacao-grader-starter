@@ -17,6 +17,9 @@ export default function Redacao() {
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState("");
   const [score, setScore] = useState<number | undefined>(undefined);
+  const [allowedToShare, setAllowedToShare] = useState<boolean | null>(null);
+  const [consentError, setConsentError] = useState<string | null>(null);
+
 
   // --------------------------------------------------
   // 1) Carrega lista de rubricas
@@ -63,7 +66,12 @@ export default function Redacao() {
       alert("Selecione a rubrica e cole o texto da redação.");
       return;
     }
-
+      if (allowedToShare === null) {
+    setConsentError(
+      "Por favor, selecione se você autoriza ou não a divulgação da sua redação."
+    );
+    return;
+  }
     setLoading(true);
     setReport("");
     setScore(undefined);
@@ -460,6 +468,87 @@ export default function Redacao() {
 
         {/* Passo 5: Botão avaliar --------------------------------------- */}
 <div style={{ marginTop: 8 }}>
+        {/* Autorização para visualização/divulgação */}
+      <fieldset
+        style={{
+          marginTop: "1rem",
+          padding: "0.75rem",
+          border: "1px solid #ccc",
+          borderRadius: "4px",
+        }}
+      >
+        <legend style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
+          Autorização para visualização e divulgação
+        </legend>
+
+        <p style={{ fontSize: "0.8rem", marginBottom: "0.5rem" }}>
+          Selecione uma das opções abaixo. Você só poderá enviar a redação após
+          escolher se autoriza ou não a divulgação.
+        </p>
+
+        <label
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "0.5rem",
+            fontSize: "0.85rem",
+            marginBottom: "0.25rem",
+          }}
+        >
+          <input
+            type="radio"
+            name="sharePermission"
+            value="yes"
+            onChange={() => {
+              setAllowedToShare(true);
+              setConsentError(null);
+            }}
+          />
+          <span>
+            Autorizo a visualização pela equipe DCZ Pensando Educação e a
+            eventual divulgação da minha redação e do relatório em materiais de
+            demonstração e nas redes sociais, caso a nota final seja igual ou
+            superior a 7,0 (ou 700, no caso do ENEM).
+          </span>
+        </label>
+
+        <label
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "0.5rem",
+            fontSize: "0.85rem",
+          }}
+        >
+          <input
+            type="radio"
+            name="sharePermission"
+            value="no"
+            onChange={() => {
+              setAllowedToShare(false);
+              setConsentError(null);
+            }}
+          />
+          <span>
+            Não autorizo a divulgação da minha redação nem do relatório em
+            materiais de demonstração ou nas redes sociais. Os dados serão
+            usados apenas para a correção automática e para fins internos de
+            suporte técnico, se necessário.
+          </span>
+        </label>
+
+        {consentError && (
+          <p
+            style={{
+              color: "red",
+              fontSize: "0.8rem",
+              marginTop: "0.5rem",
+            }}
+          >
+            {consentError}
+          </p>
+        )}
+      </fieldset>
   <button
     type="submit"
     disabled={loading || !canSubmit}

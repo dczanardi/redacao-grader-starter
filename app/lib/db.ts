@@ -1,5 +1,6 @@
 // app/lib/db.ts
 import { Pool } from "pg";
+import { randomUUID } from "crypto";
 
 let _pool: Pool | null = null;
 
@@ -24,12 +25,10 @@ function getPool() {
 export async function ensureReportsTable() {
   const pool = getPool();
 
-  // cria extensão + tabela + índices (idempotente)
+  // 1) Tabela (sem extensão pgcrypto; sem gen_random_uuid)
   await pool.query(`
-    CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
     CREATE TABLE IF NOT EXISTS reports (
-      id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      id uuid PRIMARY KEY,
       created_at timestamptz NOT NULL DEFAULT now(),
 
       student_name text,
@@ -39,20 +38,27 @@ export async function ensureReportsTable() {
       score_total integer,
       score_scale_max integer,
 
-      allowed_to_share boolean NOT NULL,
+      allowed_to_share boolean NOT NULL DEFAULT false,
       report_html text NOT NULL,
 
       model_used text
     );
+  `);
 
+  // 2) Índices (cada um separado, mais compatível)
+  await pool.query(`
     CREATE INDEX IF NOT EXISTS reports_created_at_idx
-      ON reports (created_at DESC);
+    ON reports (created_at DESC);
+  `);
 
+  await pool.query(`
     CREATE INDEX IF NOT EXISTS reports_student_identifier_idx
-      ON reports (student_identifier);
+    ON reports (student_identifier);
+  `);
 
+  await pool.query(`
     CREATE INDEX IF NOT EXISTS reports_allowed_to_share_idx
-      ON reports (allowed_to_share);
+    ON reports (allowed_to_share);
   `);
 }
 
@@ -68,15 +74,18 @@ export async function insertReport(row: {
 }) {
   const pool = getPool();
 
+  const id = randomUUID();
+
   const res = await pool.query(
     `
     INSERT INTO reports
-      (student_name, student_identifier, rubric, score_total, score_scale_max, allowed_to_share, report_html, model_used)
+      (id, student_name, student_identifier, rubric, score_total, score_scale_max, allowed_to_share, report_html, model_used)
     VALUES
-      ($1,$2,$3,$4,$5,$6,$7,$8)
+      ($1,$2,$3,$4,$5,$6,$7,$8,$9)
     RETURNING id
     `,
     [
+      id,
       row.student_name ?? null,
       row.student_identifier ?? null,
       row.rubric,
@@ -88,5 +97,5 @@ export async function insertReport(row: {
     ]
   );
 
-  return res.rows[0]?.id as string;
+  return (res.rows[0]?.id as string) || id;
 }

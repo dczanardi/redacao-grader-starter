@@ -25,7 +25,7 @@ function getPool() {
 export async function ensureReportsTable() {
   const pool = getPool();
 
-  // 1) Tabela (sem extensão pgcrypto; sem gen_random_uuid)
+  // 1) Cria a tabela (id será gerado pelo app, não pelo banco)
   await pool.query(`
     CREATE TABLE IF NOT EXISTS reports (
       id uuid PRIMARY KEY,
@@ -38,14 +38,14 @@ export async function ensureReportsTable() {
       score_total integer,
       score_scale_max integer,
 
-      allowed_to_share boolean NOT NULL DEFAULT false,
+      allowed_to_share boolean NOT NULL,
       report_html text NOT NULL,
 
       model_used text
     );
   `);
 
-  // 2) Índices (cada um separado, mais compatível)
+  // 2) Índices (separados, mais compatível)
   await pool.query(`
     CREATE INDEX IF NOT EXISTS reports_created_at_idx
     ON reports (created_at DESC);
@@ -74,6 +74,7 @@ export async function insertReport(row: {
 }) {
   const pool = getPool();
 
+  // ID gerado no app (sem depender de extensão do Postgres)
   const id = randomUUID();
 
   const res = await pool.query(

@@ -464,6 +464,8 @@ function cacheKey(payload: any) {
 export async function POST(req: Request) {
   try {
     const form = await req.formData();
+    const allowedToShare = form.get("allowed_to_share") === "true";
+    console.log("[grade2] allowedToShare:", allowedToShare);
 
     const rubricName = S(form.get("rubric") || "FUVEST");
     const rubric = await loadRubricFile(rubricName);

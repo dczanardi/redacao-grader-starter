@@ -351,8 +351,15 @@ function humanRuleId(id: string) {
   return id;
 }
 
-function buildReportHTML({ rubric, result, essayText }: any) {
+function buildReportHTML({ rubric, result, essayText, allowedToShare }: any) {
   let total = 0;
+    const consentText = allowedToShare === true ? "SIM" : "NÃO";
+
+  const consentBlock = `
+    <div style="margin: 12px 0; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #fafafa;">
+      <b>Autorização para visualização/divulgação:</b> ${consentText}
+    </div>
+  `;
 
   const rows = result.criteria.map((c: any) => {
     const w = rubric.items.find((it:any)=>it.id===c.id)?.weight ?? 0;
@@ -405,6 +412,7 @@ const totalScaleLabel = isEnem ? "0–1000" : "0–100";
 </head>
 <body>
   <h2>Nota (${totalScaleLabel}): ${totalDisplay} <span class="badge">${rubric.name}</span></h2>
+  ${consentBlock}
   <details open>
     <summary><b>Critérios</b></summary>
     <table>
@@ -549,7 +557,7 @@ if (!det.has) {
   }
 }
     // ====== RELATÓRIO ======
-    const outData = buildReportHTML({ rubric, result, essayText });
+    const outData = buildReportHTML({ rubric, result, essayText, allowedToShare });
     const response = {
       ok: true,
       total: outData.total,

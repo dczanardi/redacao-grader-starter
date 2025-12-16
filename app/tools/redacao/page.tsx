@@ -82,6 +82,7 @@ export default function Redacao() {
     fd.append("proposal_text", proposalText);
     if (proposalFile) fd.append("proposal_file", proposalFile);
     fd.append("essay_text_override", essay);
+    fd.append("allowed_to_share", allowedToShare === true ? "true" : "false");
 
     try {
       const res = await fetch("/api/grade2", { method: "POST", body: fd });

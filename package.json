@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@sparticuz/chromium": "^138.0.2",
-    "next": "14.2.5",
+    "next": "14.2.35",
     "once": "^1.4.0",
     "openai": "4.58.1",
     "pdf-parse": "^1.1.1",

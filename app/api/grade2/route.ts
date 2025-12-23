@@ -11,6 +11,8 @@ import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
 import crypto from "crypto";
+import { ensureReportsTable, insertReport } from "../../lib/db";
+
 
 console.log("[grade2] route module loaded");
 
@@ -566,6 +568,28 @@ if (!det.has) {
       triggered_rules: result.triggered_rules || [],
       repertoire_detected: det
     };
+    try {
+  await ensureReportsTable();
+
+  const rubricName = String((rubric as any)?.name || "unknown");
+  const isEnem = rubricName.toUpperCase().includes("ENEM");
+
+  const score_total = isEnem ? Math.round(outData.total * 10) : Math.round(outData.total);
+  const score_scale_max = isEnem ? 1000 : 100;
+
+  await insertReport({
+    student_name: null,
+    student_identifier: null,
+    rubric: rubricName,
+    score_total,
+    score_scale_max,
+    allowed_to_share: !!allowedToShare,
+    report_html: outData.html,
+    model_used: String(modelUsed || ""),
+  });
+} catch (e) {
+  console.error("[grade2] failed to save report:", e);
+}
 
     cache[key] = response;
     await saveCache(cache);

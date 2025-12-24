@@ -140,7 +140,7 @@ export default function ReportsPage() {
                   <td style={td}>
                     {r.score_total ?? ""}{r.score_scale_max ? ` / ${r.score_scale_max}` : ""}
                   </td>
-                  <td style={td}>{r.allowed_to_share ? "true" : "false"}</td>
+                  <td style={td}>{r.allowed_to_share ? "SIM" : "NÃO"}</td>
                   <td style={td}>{r.model_used ?? ""}</td>
                   <td style={td}>{r.created_at}</td>
                   <td style={td}>

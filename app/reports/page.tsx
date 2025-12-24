@@ -170,7 +170,7 @@ export default function ReportsPage() {
 }
 
 const th: React.CSSProperties = {
-  textAlign: "left",
+  textAlign: "center",
   padding: "12px 10px",
   borderBottom: "1px solid #eee",
   fontWeight: 700,
@@ -178,6 +178,7 @@ const th: React.CSSProperties = {
 };
 
 const td: React.CSSProperties = {
+  textAlign: "center",
   padding: "10px",
   borderBottom: "1px solid #f2f2f2",
   verticalAlign: "top",

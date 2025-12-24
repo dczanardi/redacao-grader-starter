@@ -475,7 +475,15 @@ export async function POST(req: Request) {
   try {
     const form = await req.formData();
     const allowedToShare = form.get("allowed_to_share") === "true";
-    
+    const studentNameRaw = form.get("student_name");
+    const studentIdentifierRaw = form.get("student_identifier");
+
+    const student_name =
+  studentNameRaw ? String(studentNameRaw).trim() : null;
+
+    const student_identifier =
+  studentIdentifierRaw ? String(studentIdentifierRaw).trim() : null;
+
     const rubricName = S(form.get("rubric") || "FUVEST");
     const rubric = await loadRubricFile(rubricName);
 
@@ -578,8 +586,8 @@ if (!det.has) {
   const score_scale_max = isEnem ? 1000 : 100;
 
   await insertReport({
-    student_name: null,
-    student_identifier: null,
+    student_name,
+    student_identifier,
     rubric: rubricName,
     score_total,
     score_scale_max,

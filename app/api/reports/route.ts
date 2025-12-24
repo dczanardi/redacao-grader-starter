@@ -16,16 +16,39 @@ const pool = new Pool({
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const q = (searchParams.get("q") || "").trim(); // nome OU identificador
-    const limit = Math.min(Number(searchParams.get("limit") || 200), 500);
 
+    // Quantidade de itens (padrão 50; máximo 200)
+    const limitRaw = Number(searchParams.get("limit") || "50");
+    const limit = Math.min(Math.max(limitRaw, 1), 200);
+
+    // Mostrar apenas relatórios autorizados (padrão: true)
+    const onlyShareable = (searchParams.get("onlyShareable") ?? "true") === "true";
+
+    // Busca simples por texto (nome/identificador/rubrica)
+    const q = String(searchParams.get("q") || "").trim();
+
+    const whereParts: string[] = [];
     const params: any[] = [];
-    let where = "";
+
+    if (onlyShareable) {
+      params.push(true);
+      whereParts.push(`allowed_to_share = $${params.length}`);
+    }
 
     if (q) {
-      params.push(q);
-      where = `WHERE student_identifier = $1 OR student_name = $1`;
+      params.push(`%${q}%`);
+      const p = `$${params.length}`;
+      
+      whereParts.push(
+        `(COALESCE(student_name,'') ILIKE ${p} OR COALESCE(student_identifier,'') ILIKE ${p} OR COALESCE(rubric,'') ILIKE ${p})`
+      );
     }
+
+    const whereSQL = whereParts.length ? `WHERE ${whereParts.join(" AND ")}` : "";
+
+    // Lista “leve” (não traz report_html) — isso deixa rápido
+    params.push(limit);
+    const limitParam = `$${params.length}`;
 
     const sql = `
       SELECT
@@ -36,18 +59,23 @@ export async function GET(req: Request) {
         score_total,
         score_scale_max,
         allowed_to_share,
-        created_at,
-        model_used
+        model_used,
+        created_at
       FROM reports
-      ${where}
+      ${whereSQL}
       ORDER BY created_at DESC
-      LIMIT ${limit};
+      LIMIT ${limitParam};
     `;
 
     const r = await pool.query(sql, params);
-    return NextResponse.json({ ok: true, reports: r.rows });
+
+    return NextResponse.json({
+      ok: true,
+      count: r.rows.length,
+      items: r.rows,
+    });
   } catch (e: any) {
-    console.error("[reports] list error:", e);
+    console.error("[reports:list] error:", e);
     return NextResponse.json(
       { ok: false, error: e?.message || "Falha ao listar relatórios" },
       { status: 500 }

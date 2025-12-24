@@ -128,7 +128,6 @@ export default function ReportsPage() {
           <thead>
             <tr style={{ background: "#fafafa" }}>
               <th style={th}>Aluno</th>
-              <th style={th}>Identificador</th>
               <th style={th}>Rubrica</th>
               <th style={th}>Nota</th>
               <th style={th}>Compartilhar</th>
@@ -140,7 +139,7 @@ export default function ReportsPage() {
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td style={{ padding: 14, color: "#666" }} colSpan={8}>
+                <td style={{ padding: 14, color: "#666" }} colSpan={7}>
                   Nenhum relatório encontrado.
                 </td>
               </tr>
@@ -148,7 +147,6 @@ export default function ReportsPage() {
               rows.map((r) => (
                 <tr key={r.id}>
                   <td style={td}>{r.student_name ?? ""}</td>
-                  <td style={td}>{r.student_identifier ?? ""}</td>
                   <td style={td}>{r.rubric ?? ""}</td>
                   <td style={td}>
                     {r.score_total ?? ""}{r.score_scale_max ? ` / ${r.score_scale_max}` : ""}

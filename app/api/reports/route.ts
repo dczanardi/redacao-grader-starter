@@ -17,19 +17,28 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
 
-    // Quantidade de itens (padrão 50; máximo 200)
+    // Limite (padrão 50; máx 200)
     const limitRaw = Number(searchParams.get("limit") || "50");
     const limit = Math.min(Math.max(limitRaw, 1), 200);
 
-    // Mostrar apenas relatórios autorizados (padrão: true)
-    const onlyShareable = (searchParams.get("onlyShareable") ?? "true") === "true";
-
-    // Busca simples por texto (nome/identificador/rubrica)
+    // Busca simples (nome / identificador / rubrica)
     const q = String(searchParams.get("q") || "").trim();
+
+    // Filtro opcional: só compartilháveis
+    // Padrão: NÃO filtra (mostra true e false)
+    const onlyShareableParam = String(searchParams.get("onlyShareable") || "")
+      .trim()
+      .toLowerCase();
+
+    const onlyShareable =
+      onlyShareableParam === "1" ||
+      onlyShareableParam === "true" ||
+      onlyShareableParam === "sim";
 
     const whereParts: string[] = [];
     const params: any[] = [];
 
+    // só aplica filtro se onlyShareable = true
     if (onlyShareable) {
       params.push(true);
       whereParts.push(`allowed_to_share = $${params.length}`);
@@ -38,7 +47,6 @@ export async function GET(req: Request) {
     if (q) {
       params.push(`%${q}%`);
       const p = `$${params.length}`;
-      
       whereParts.push(
         `(COALESCE(student_name,'') ILIKE ${p} OR COALESCE(student_identifier,'') ILIKE ${p} OR COALESCE(rubric,'') ILIKE ${p})`
       );
@@ -46,7 +54,7 @@ export async function GET(req: Request) {
 
     const whereSQL = whereParts.length ? `WHERE ${whereParts.join(" AND ")}` : "";
 
-    // Lista “leve” (não traz report_html) — isso deixa rápido
+    // lista leve (não traz report_html)
     params.push(limit);
     const limitParam = `$${params.length}`;
 

@@ -13,6 +13,19 @@ type ReportRow = {
   student_identifier: string | null;
   rubric: string | null;
 };
+function formatCreatedAt(iso: string) {
+  // Ex.: "2025-12-23T18:39:02.103Z" -> "2025-12-23 - 18:39"
+  if (!iso) return "";
+  const s = String(iso);
+
+  const [datePart, timePartRaw] = s.split("T");
+  if (!timePartRaw) return s;
+
+  const timePart = timePartRaw.replace("Z", "");
+  const hhmm = timePart.slice(0, 5); // "18:39"
+
+  return `${datePart} - ${hhmm}`;
+}
 
 export default function ReportsPage() {
   const [rows, setRows] = useState<ReportRow[]>([]);
@@ -142,7 +155,7 @@ export default function ReportsPage() {
                   </td>
                   <td style={td}>{r.allowed_to_share ? "SIM" : "NÃO"}</td>
                   <td style={td}>{r.model_used ?? ""}</td>
-                  <td style={td}>{r.created_at}</td>
+                  <td style={td}>{formatCreatedAt(r.created_at)}</td>
                   <td style={td}>
                     <a href={`/api/reports/${r.id}`} target="_blank" rel="noreferrer">
                       abrir

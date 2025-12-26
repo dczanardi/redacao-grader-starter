@@ -1,7 +1,7 @@
 // app/lib/auth.ts
 import { createHmac, timingSafeEqual } from "crypto";
 
-type SessionPayload = { e: string; exp: number };
+type SessionPayload = { e: string; exp: number; products?: string[] };
 
 function base64urlEncode(input: string) {
   return Buffer.from(input).toString("base64url");
@@ -38,37 +38,86 @@ export function signSession(email: string) {
   return `${payloadB64}.${sig}`;
 }
 
-export function verifySession(token: string | undefined | null) {
-  if (!token) return null;
+function getAllowedProductsForEmail(email: string): string[] {
+  // Formato da env:
+  // ALLOWED_PRODUCTS="email1@x.com:redacao,quimica;email2@y.com:redacao"
+  const raw = (process.env.ALLOWED_PRODUCTS || "").trim();
+  if (!raw) return [];
 
-  const secret = process.env.AUTH_SECRET || "";
-  if (!secret) return null;
+  const target = email.trim().toLowerCase();
+  const entries = raw.split(";").map(s => s.trim()).filter(Boolean);
 
-  const [payloadB64, sig] = token.split(".");
-  if (!payloadB64 || !sig) return null;
+  for (const entry of entries) {
+    const [mail, prods] = entry.split(":").map(s => (s || "").trim());
+    if (!mail || !prods) continue;
 
-  const expected = hmacSHA256(payloadB64, secret);
-  // comparação segura
+    if (mail.toLowerCase() === target) {
+      return prods
+        .split(",")
+        .map(s => s.trim().toLowerCase())
+        .filter(Boolean);
+    }
+  }
+  return [];
+}
+
+export function verifySessionPayload(cookieHeader: string): SessionPayload | null {
   try {
-    const a = Buffer.from(sig);
-    const b = Buffer.from(expected);
+    // 1) Pegar o cookie "session" do header inteiro
+    const token =
+      cookieHeader
+        .split(";")
+        .map((p) => p.trim())
+        .find((p) => p.startsWith("session="))
+        ?.slice("session=".length) || "";
+
+    if (!token) return null;
+
+    // 2) JWT: header.payload.signature
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+
+    const [headerB64, payloadB64, sigB64] = parts;
+
+    // 3) Verificar assinatura (HMAC)
+    const secret = process.env.AUTH_SECRET || "";
+    if (!secret) return null;
+
+    const expected = hmacSHA256(`${headerB64}.${payloadB64}`, secret);
+
+    const a = Buffer.from(sigB64, "base64url");
+    const b = Buffer.from(expected, "base64url");
+
     if (a.length !== b.length) return null;
 
-    const aView = new Uint8Array(a.buffer, a.byteOffset, a.byteLength);
-    const bView = new Uint8Array(b.buffer, b.byteOffset, b.byteLength);
-    
+    // (cast só para o TypeScript não implicar com Buffer)
+    if (!timingSafeEqual(a as unknown as Uint8Array, b as unknown as Uint8Array)) return null;
 
-    if (!timingSafeEqual(aView, bView)) return null;
-  } catch {
-    return null;
-  }
-
-  try {
+    // 4) Decodificar payload e validar exp
     const payload = JSON.parse(base64urlDecode(payloadB64)) as SessionPayload;
+
     if (!payload?.e || !payload?.exp) return null;
     if (Date.now() > payload.exp) return null;
-    return payload.e;
+
+    // 5) Anexar produtos permitidos
+    payload.products = getAllowedProductsForEmail(payload.e);
+
+    return payload;
   } catch {
     return null;
   }
 }
+// helper: extrai um cookie pelo nome
+function getCookieValue(cookieHeader: string, name: string): string | null {
+  const cookies = cookieHeader.split(";").map((c) => c.trim());
+  const hit = cookies.find((c) => c.startsWith(name + "="));
+  if (!hit) return null;
+  return decodeURIComponent(hit.slice(name.length + 1));
+}
+
+// Mantém compatibilidade: quem usa verifySession continua recebendo só o email.
+export function verifySession(cookieHeader: string): string | null {
+  const payload = verifySessionPayload(cookieHeader);
+  return payload?.e ?? null;
+}
+

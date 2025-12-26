@@ -1,5 +1,5 @@
 // app/lib/auth.ts
-import crypto from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 
 type SessionPayload = { e: string; exp: number };
 
@@ -11,7 +11,7 @@ function base64urlDecode(input: string) {
 }
 
 function hmacSHA256(data: string, secret: string) {
-  return crypto.createHmac("sha256", secret).update(data).digest("base64url");
+return createHmac("sha256", secret).update(data).digest("base64url");
 }
 
 export function isEmailAllowed(email: string) {
@@ -53,7 +53,12 @@ export function verifySession(token: string | undefined | null) {
     const a = Buffer.from(sig);
     const b = Buffer.from(expected);
     if (a.length !== b.length) return null;
-    if (!crypto.timingSafeEqual(a, b)) return null;
+
+    const aView = new Uint8Array(a.buffer, a.byteOffset, a.byteLength);
+    const bView = new Uint8Array(b.buffer, b.byteOffset, b.byteLength);
+    
+
+    if (!timingSafeEqual(aView, bView)) return null;
   } catch {
     return null;
   }

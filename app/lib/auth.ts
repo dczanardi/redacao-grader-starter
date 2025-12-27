@@ -63,15 +63,24 @@ function getAllowedProductsForEmail(email: string): string[] {
 
 export function verifySessionPayload(cookieHeader: string): SessionPayload | null {
   try {
-    // 1) Pegar o cookie "dcz_session" do header inteiro
-    const token =
-      cookieHeader
-        .split(";")
-        .map((p) => p.trim())
-        .find((p) => p.startsWith("dcz_session="))
-        ?.slice("dcz_session=".length) || "";
+// 1) Pegar o token: pode vir como HEADER inteiro ("...; dcz_session=...; ...")
+//    OU pode vir como o TOKEN puro (quando alguém passa cookies().get(...).value)
+let token = "";
 
-    if (!token) return null;
+// Caso A: veio o header inteiro (ou uma string com vários cookies)
+if (cookieHeader.includes(";") || cookieHeader.includes("dcz_session=")) {
+  token =
+    cookieHeader
+      .split(";")
+      .map((p) => p.trim())
+      .find((p) => p.startsWith("dcz_session="))
+      ?.slice("dcz_session=".length) || "";
+} else {
+  // Caso B: veio o token puro
+  token = (cookieHeader || "").trim();
+}
+
+if (!token) return null;
 
     // 2) JWT: header.payload.signature
     const parts = token.split(".");

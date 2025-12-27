@@ -63,13 +63,13 @@ function getAllowedProductsForEmail(email: string): string[] {
 
 export function verifySessionPayload(cookieHeader: string): SessionPayload | null {
   try {
-    // 1) Pegar o cookie "session" do header inteiro
+    // 1) Pegar o cookie "dcz_session" do header inteiro
     const token =
       cookieHeader
         .split(";")
         .map((p) => p.trim())
         .find((p) => p.startsWith("dcz_session="))
-        ?.slice("session=".length) || "";
+        ?.slice("dcz_session=".length) || "";
 
     if (!token) return null;
 

@@ -87,16 +87,34 @@ token = decodeURIComponent(token || "");
 if (!token) return null;
 
     // 2) JWT: header.payload.signature
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
+    // 2) Token pode vir em 2 formatos:
+// - v1 (legado): payload.signature
+// - v2 (JWT): header.payload.signature
+const parts = token.split(".");
 
-    const [headerB64, payloadB64, sigB64] = parts;
+let dataToSign = "";
+let payloadB64 = "";
+let sigB64 = "";
 
-    // 3) Verificar assinatura (HMAC)
-    const secret = process.env.AUTH_SECRET || "";
-    if (!secret) return null;
+if (parts.length === 2) {
+  // legado: payload.signature
+  [payloadB64, sigB64] = parts;
+  dataToSign = payloadB64;
+} else if (parts.length === 3) {
+  // JWT: header.payload.signature
+  const headerB64 = parts[0];
+  payloadB64 = parts[1];
+  sigB64 = parts[2];
+  dataToSign = `${headerB64}.${payloadB64}`;
+} else {
+  return null;
+}
 
-    const expected = hmacSHA256(`${headerB64}.${payloadB64}`, secret);
+// 3) Verificar assinatura (HMAC)
+const secret = process.env.AUTH_SECRET || "";
+if (!secret) return null;
+
+const expected = hmacSHA256(dataToSign, secret);
 
     const a = Buffer.from(sigB64, "base64url");
     const b = Buffer.from(expected, "base64url");

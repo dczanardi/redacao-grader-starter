@@ -68,7 +68,7 @@ export function verifySessionPayload(cookieHeader: string): SessionPayload | nul
       cookieHeader
         .split(";")
         .map((p) => p.trim())
-        .find((p) => p.startsWith("session="))
+        .find((p) => p.startsWith("dcz_session="))
         ?.slice("session=".length) || "";
 
     if (!token) return null;

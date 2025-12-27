@@ -1,11 +1,11 @@
-// app/tools/redacao/layout.tsx
-import { headers } from "next/headers";
+import React from "react";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifySession } from "@/app/lib/auth";
 
 export default function RedacaoLayout({ children }: { children: React.ReactNode }) {
-  const cookieHeader = headers().get("cookie") || "";
-  const email = verifySession(cookieHeader);
+  const token = cookies().get("dcz_session")?.value || "";
+  const email = verifySession(`dcz_session=${token}`);
 
   if (!email) redirect("/login");
 

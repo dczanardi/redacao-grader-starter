@@ -80,6 +80,10 @@ if (cookieHeader.includes(";") || cookieHeader.includes("dcz_session=")) {
   token = (cookieHeader || "").trim();
 }
 
+// MUITO IMPORTANTE: o cookie pode vir "URL-encoded" (%2E no lugar de .)
+// então a gente decodifica antes de validar e antes do split(".")
+token = decodeURIComponent(token || "");
+
 if (!token) return null;
 
     // 2) JWT: header.payload.signature

@@ -39,25 +39,16 @@ export function signSession(email: string) {
 }
 
 function getAllowedProductsForEmail(email: string): string[] {
-  // Formato da env:
-  // ALLOWED_PRODUCTS="email1@x.com:redacao,quimica;email2@y.com:redacao"
-  const raw = (process.env.ALLOWED_PRODUCTS || "").trim();
-  if (!raw) return [];
+  const e = (email || "").trim().toLowerCase();
+  if (!e) return [];
 
-  const target = email.trim().toLowerCase();
-  const entries = raw.split(";").map(s => s.trim()).filter(Boolean);
+  // Regra simples (pra você testar agora):
+  // seu e-mail recebe acesso ao produto "redacao"
+  if (e === "dczanardi@gmail.com") return ["redacao"];
 
-  for (const entry of entries) {
-    const [mail, prods] = entry.split(":").map(s => (s || "").trim());
-    if (!mail || !prods) continue;
+  // Se quiser liberar pra mais alguém, você vai duplicar a linha assim:
+  // if (e === "outro@email.com") return ["redacao"];
 
-    if (mail.toLowerCase() === target) {
-      return prods
-        .split(",")
-        .map(s => s.trim().toLowerCase())
-        .filter(Boolean);
-    }
-  }
   return [];
 }
 

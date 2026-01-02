@@ -12,12 +12,15 @@ import { promises as fs } from "fs";
 import path from "path";
 import crypto from "crypto";
 import { ensureReportsTable, insertReport } from "../../lib/db";
-
-
-console.log("[grade2] route module loaded");
+import { consumeOneCredit, refundOneCredit, getCreditsRemaining } from "@/app/lib/credits";
+import { verifySession } from "@/app/lib/auth";
+import { cookies } from "next/headers";
+const DEBUG = process.env.NODE_ENV !== "production";
+if (DEBUG) console.log("[grade2] route module loaded");
 
 // ====== CONFIGS ======
 const LEVEL_MAP = [0.0, 0.3, 0.5, 0.7, 0.9, 1.0]; // N0..N5 (agora nível 0 = 0.0)
+
 const RUBRICS_DIR = path.join(process.cwd(), "rubrics");
 const FUVEST_WEIGHTS: Record<string, number> = { C1: 0.30, C2: 0.20, C3: 0.30, C4: 0.20 };
 
@@ -472,17 +475,45 @@ function cacheKey(payload: any) {
 
 // ====== POST ======
 export async function POST(req: Request) {
+  const product = "redacao";
+  let email: string | null = null;
+  let reserved = false;
+
   try {
+    // ===== AUTH =====
+    const headerCookie = req.headers.get("cookie") || "";
+    const token = cookies().get("dcz_session")?.value || null;
+
+    // usa o header se existir; senão monta com o token do cookies()
+    const cookieHeader = headerCookie || (token ? `dcz_session=${token}` : "");
+
+    if (!cookieHeader) {
+      return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+    }
+
+    const sess: any = await verifySession(cookieHeader);
+
+    email =
+      (typeof sess === "string" ? sess : null) ||
+      sess?.email ||
+      sess?.user?.email ||
+      sess?.data?.email ||
+      sess?.session?.email ||
+      null;
+
+    if (!email) {
+      return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+    }
+
+    // ===== 1) LÊ O FORM PRIMEIRO (não debita crédito se cair no cache DEV) =====
     const form = await req.formData();
+
     const allowedToShare = form.get("allowed_to_share") === "true";
     const studentNameRaw = form.get("student_name");
     const studentIdentifierRaw = form.get("student_identifier");
 
-    const student_name =
-  studentNameRaw ? String(studentNameRaw).trim() : null;
-
-    const student_identifier =
-  studentIdentifierRaw ? String(studentIdentifierRaw).trim() : null;
+    const student_name = studentNameRaw ? String(studentNameRaw).trim() : null;
+    const student_identifier = studentIdentifierRaw ? String(studentIdentifierRaw).trim() : null;
 
     const rubricName = S(form.get("rubric") || "FUVEST");
     const rubric = await loadRubricFile(rubricName);
@@ -492,28 +523,42 @@ export async function POST(req: Request) {
     const essayText = normalizeEssayText(S(form.get("essay_text_override") || form.get("essay_text") || ""));
     if (!essayText) throw new Error("Cole o texto da redação (campo obrigatório).");
 
-// ====== CACHE DEV ======
-const modelUsed =
-  process.env.ESSAY_MODEL ||
-  process.env.OCR_MODEL_PRIMARY ||
-  "gpt-5";
+    // ====== CACHE DEV ======
+    const modelUsed = process.env.ESSAY_MODEL || process.env.OCR_MODEL_PRIMARY || "gpt-5";
 
-const payloadForHash = {
-  rubric,
-  proposalText: prop.text || "",
-  proposalImage: !!prop.imageDataUrl,
-  essayText,
-  levelMap: LEVEL_MAP,
-  model: modelUsed,
-  version: "v3.2-soft-student",
-};
+    const payloadForHash = {
+      rubric,
+      proposalText: prop.text || "",
+      proposalImage: !!prop.imageDataUrl,
+      essayText,
+      levelMap: LEVEL_MAP,
+      model: modelUsed,
+      version: "v3.2-soft-student",
+    };
 
-console.log("[grade2] usando modelo:", modelUsed);
+    const key = cacheKey(payloadForHash);
+    await ensureCacheDir();
+    let cache = await loadCache();
 
-const key = cacheKey(payloadForHash);
-await ensureCacheDir();
-let cache = await loadCache();
-if (cache[key]) return NextResponse.json(cache[key]);
+    // Se estiver em DEV e já existe cache, não debita crédito
+    if (cache[key]) return NextResponse.json(cache[key]);
+
+    // ===== 2) CREDITS (uma vez só) =====
+    const credits = await getCreditsRemaining(email, product);
+    if (credits <= 0) {
+      return NextResponse.json(
+        { error: "Sem créditos disponíveis para avaliar redação." },
+        { status: 402 }
+      );
+    }
+
+    reserved = await consumeOneCredit(email, product);
+    if (!reserved) {
+      return NextResponse.json(
+        { error: "Sem créditos disponíveis para avaliar redação." },
+        { status: 402 }
+      );
+    }
 
     // ====== AVALIAÇÃO ======
     const result = await callModelStrict({
@@ -523,87 +568,107 @@ if (cache[key]) return NextResponse.json(cache[key]);
       essayText,
     });
 
-// ====== PARA-CHOQUE: CAP SE NÃO HÁ REPERTÓRIO ======
-const det = detectRepertoire(essayText, prop.text);
-let autoTriggered = false;
+    // ====== PARA-CHOQUE: CAP SE NÃO HÁ REPERTÓRIO ======
+    const det = detectRepertoire(essayText, prop.text);
+    let autoTriggered = false;
 
-if (!det.has) {
-  const c2 = result.criteria.find(
-    (c:any) => c.id.toUpperCase() === "C2" || /argumenta/i.test(c.name)
-  );
-  if (c2 && c2.level > 2) {
-    c2.level = 2;
-    const nivelCapC2 = LEVEL_MAP[2]; // 0.5
-    const nivelCapC2Label = nivelCapC2.toFixed(1).replace(".", ",");
-    c2.just = softenStudentFacing(
-      `Faltou repertório verificável; por isso, este critério foi limitado ao nível ${nivelCapC2Label}. ${c2.just}`
-    );
-    autoTriggered = true;
-  }
+    if (!det.has) {
+      const c2 = result.criteria.find(
+        (c: any) => c.id.toUpperCase() === "C2" || /argumenta/i.test(c.name)
+      );
+      if (c2 && c2.level > 2) {
+        c2.level = 2;
+        const nivelCapC2 = LEVEL_MAP[2]; // 0.5
+        const nivelCapC2Label = nivelCapC2.toFixed(1).replace(".", ",");
+        c2.just = softenStudentFacing(
+          `Faltou repertório verificável; por isso, este critério foi limitado ao nível ${nivelCapC2Label}. ${c2.just}`
+        );
+        autoTriggered = true;
+      }
 
-  const c1 = result.criteria.find(
-    (c:any) => c.id.toUpperCase() === "C1" || /tema|gênero|genero/i.test(c.name)
-  );
-  if (c1 && c1.level > 3) {
-    c1.level = 3;
-    const nivelCapC1 = LEVEL_MAP[3]; // 0.7
-    const nivelCapC1Label = nivelCapC1.toFixed(1).replace(".", ",");
-    c1.just = softenStudentFacing(
-      `Faltou repertório verificável; por isso, este critério foi avaliado até o nível ${nivelCapC1Label}. ${c1.just}`
-    );
-    autoTriggered = true;
-  }
+      const c1 = result.criteria.find(
+        (c: any) => c.id.toUpperCase() === "C1" || /tema|gênero|genero/i.test(c.name)
+      );
+      if (c1 && c1.level > 3) {
+        c1.level = 3;
+        const nivelCapC1 = LEVEL_MAP[3]; // 0.7
+        const nivelCapC1Label = nivelCapC1.toFixed(1).replace(".", ",");
+        c1.just = softenStudentFacing(
+          `Faltou repertório verificável; por isso, este critério foi avaliado até o nível ${nivelCapC1Label}. ${c1.just}`
+        );
+        autoTriggered = true;
+      }
 
-  if (autoTriggered) {
-    result.triggered_rules = result.triggered_rules || [];
-    result.triggered_rules.push({
-      id: "repertorio_obrigatorio_auto",
-      criterion_ids: [
-        result.criteria.find((c:any)=>c.id.toUpperCase()==="C1")?.id || "C1",
-        result.criteria.find((c:any)=>c.id.toUpperCase()==="C2")?.id || "C2"
-      ],
-      reason: det.reason
-    });
-  }
-}
+      if (autoTriggered) {
+        result.triggered_rules = result.triggered_rules || [];
+        result.triggered_rules.push({
+          id: "repertorio_obrigatorio_auto",
+          criterion_ids: [
+            result.criteria.find((c: any) => c.id.toUpperCase() === "C1")?.id || "C1",
+            result.criteria.find((c: any) => c.id.toUpperCase() === "C2")?.id || "C2",
+          ],
+          reason: det.reason,
+        });
+      }
+    }
+
     // ====== RELATÓRIO ======
     const outData = buildReportHTML({ rubric, result, essayText, allowedToShare });
+
     const response = {
       ok: true,
       total: outData.total,
       report_html: outData.html,
       levelMap: LEVEL_MAP,
       triggered_rules: result.triggered_rules || [],
-      repertoire_detected: det
+      repertoire_detected: det,
     };
+
+    // salva relatório no banco (se falhar, não quebra o usuário)
     try {
-  await ensureReportsTable();
+      await ensureReportsTable();
 
-  const rubricName = String((rubric as any)?.name || "unknown");
-  const isEnem = rubricName.toUpperCase().includes("ENEM");
+      const rubricName2 = String((rubric as any)?.name || "unknown");
+      const isEnem = rubricName2.toUpperCase().includes("ENEM");
 
-  const score_total = isEnem ? Math.round(outData.total * 10) : Math.round(outData.total);
-  const score_scale_max = isEnem ? 1000 : 100;
+      const score_total = isEnem ? Math.round(outData.total * 10) : Math.round(outData.total);
+      const score_scale_max = isEnem ? 1000 : 100;
 
-  await insertReport({
-    student_name,
-    student_identifier,
-    rubric: rubricName,
-    score_total,
-    score_scale_max,
-    allowed_to_share: !!allowedToShare,
-    report_html: outData.html,
-    model_used: String(modelUsed || ""),
-  });
-} catch (e) {
-  console.error("[grade2] failed to save report:", e);
-}
+      await insertReport({
+        student_name,
+        student_identifier,
+        rubric: rubricName2,
+        score_total,
+        score_scale_max,
+        allowed_to_share: !!allowedToShare,
+        report_html: outData.html,
+        model_used: String(modelUsed || ""),
+      });
+    } catch (e) {
+      console.error("[grade2] failed to save report:", e);
+    }
 
+    // grava cache DEV
     cache[key] = response;
     await saveCache(cache);
+
     return NextResponse.json(response);
   } catch (e: any) {
     console.error("[grade2] POST error:", e);
-    return NextResponse.json({ error: e?.message || "Falha na avaliação" }, { status: 500 });
+
+    // Se debitou e falhou antes de entregar a correção, estorna
+    if (reserved && email) {
+      try {
+        await refundOneCredit(email, product);
+        if (DEBUG) console.log("[grade2] credit refunded after failure");
+      } catch (err) {
+        console.error("[grade2] refund failed:", err);
+      }
+    }
+
+    return NextResponse.json(
+      { error: e?.message || "Falha na avaliação" },
+      { status: 500 }
+    );
   }
 }

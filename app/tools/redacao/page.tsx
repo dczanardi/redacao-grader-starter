@@ -3,6 +3,24 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
+type MeResponse = {
+  ok: boolean;
+  email?: string;
+  products?: string[];
+  credits?: Record<string, number>;
+};
+
+async function fetchMe(): Promise<MeResponse> {
+  const res = await fetch("/api/me", { credentials: "include" });
+
+  // Se não está logado, a rota pode responder 401
+  if (res.status === 401) return { ok: false };
+
+  // Se der outro erro, também tratamos como ok=false
+  if (!res.ok) return { ok: false };
+
+  return res.json();
+}
 
 type RubricListResp = { items?: { id: string; file: string }[]; error?: string };
 type GradeResp = { ok?: boolean; report_html?: string; total?: number; error?: string };
@@ -19,6 +37,23 @@ export default function Redacao() {
   const [score, setScore] = useState<number | undefined>(undefined);
   const [allowedToShare, setAllowedToShare] = useState<boolean | null>(null);
   const [consentError, setConsentError] = useState<string | null>(null);
+  const [creditsRedacao, setCreditsRedacao] = useState<number | null>(null);
+const [meLoading, setMeLoading] = useState(true);
+
+async function reloadCredits() {
+  setMeLoading(true);
+  try {
+    const me = await fetchMe();
+    const c = me?.credits?.redacao;
+    setCreditsRedacao(typeof c === "number" ? c : 0);
+  } finally {
+    setMeLoading(false);
+  }
+}
+
+useEffect(() => {
+  reloadCredits();
+}, []);
 
 
   // --------------------------------------------------
@@ -99,8 +134,10 @@ export default function Redacao() {
         throw new Error(data?.error || txt);
       }
 
+      await reloadCredits();
       setReport(String(data.report_html || ""));
       setScore(data.total);
+      
 
       window.scrollTo({
         top: document.body.scrollHeight,
@@ -467,7 +504,13 @@ export default function Redacao() {
           </div>
         </div>
 
-        {/* Passo 5: Botão avaliar --------------------------------------- */}
+        
+<div style={{ margin: "10px 0", opacity: meLoading ? 0.7 : 1 }}>
+  <b>Créditos disponíveis:</b>{" "}
+  {meLoading ? "carregando..." : (creditsRedacao ?? 0)}
+</div>
+
+{/* Passo 5: Botão avaliar --------------------------------------- */}
 <div style={{ marginTop: 8 }}>
         {/* Autorização para visualização/divulgação */}
       <fieldset
@@ -552,7 +595,12 @@ export default function Redacao() {
       </fieldset>
   <button
     type="submit"
-    disabled={loading || !canSubmit}
+    disabled={
+  loading ||
+  meLoading ||
+  !canSubmit ||
+  (typeof creditsRedacao === "number" && creditsRedacao <= 0)
+}
     style={{
       width: "100%",
       padding: "12px 16px",
@@ -565,7 +613,15 @@ export default function Redacao() {
       cursor: loading || !canSubmit ? "not-allowed" : "pointer",
     }}
   >
-            {loading ? "Gerando avaliação..." : "5) AVALIAR SUA REDAÇÃO"}
+            {
+  loading
+    ? "Gerando avaliação..."
+    : meLoading
+      ? "Carregando seus créditos..."
+      : (typeof creditsRedacao === "number" && creditsRedacao <= 0)
+        ? "Sem créditos — não é possível avaliar"
+        : `5) AVALIAR SUA REDAÇÃO (você tem ${creditsRedacao} crédito${creditsRedacao === 1 ? "" : "s"})`
+}
           </button>
         </div>
       </form>

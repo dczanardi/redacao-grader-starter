@@ -1,4 +1,4 @@
-// app/api/auth/login/route.ts
+// /app/api/auth/login/route.ts
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -22,15 +22,19 @@ export async function POST(req: Request) {
 
   const token = signSession(emailRaw);
 
-  const res = NextResponse.redirect(new URL("/tools/redacao", req.url));
+  // importante: cookie Secure só funciona em https
+  const isHttps = new URL(req.url).protocol === "https:";
+
+  const res = NextResponse.json({ ok: true }, { status: 200 });
   res.cookies.set({
     name: "dcz_session",
     value: token,
     httpOnly: true,
-    secure: true,
+    secure: isHttps,
     sameSite: "lax",
     path: "/",
     maxAge: 30 * 24 * 60 * 60, // 30 dias
   });
+
   return res;
 }

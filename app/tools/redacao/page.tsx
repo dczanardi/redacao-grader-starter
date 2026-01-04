@@ -25,6 +25,9 @@ async function fetchMe(): Promise<MeResponse> {
 type RubricListResp = { items?: { id: string; file: string }[]; error?: string };
 type GradeResp = { ok?: boolean; report_html?: string; total?: number; error?: string };
 
+const BUY_REDACAO_URL =
+  process.env.NEXT_PUBLIC_BUY_REDACAO_URL || "https://mpago.la/19QsBE1";
+
 export default function Redacao() {
   const [rubrics, setRubrics] = useState<string[]>([]);
   const [rubric, setRubric] = useState("");
@@ -39,6 +42,9 @@ export default function Redacao() {
   const [consentError, setConsentError] = useState<string | null>(null);
   const [creditsRedacao, setCreditsRedacao] = useState<number | null>(null);
 const [meLoading, setMeLoading] = useState(true);
+// --- créditos ---
+const creditsValue = typeof creditsRedacao === "number" ? creditsRedacao : 0;
+const hasCredits = creditsValue > 0;
 
 async function reloadCredits() {
   setMeLoading(true);
@@ -91,6 +97,8 @@ useEffect(() => {
     () => !!essay.trim() && !!rubric,
     [essay, rubric]
   );
+  const canSubmitFinal = canSubmit && hasCredits && !meLoading;
+
 
   // --------------------------------------------------
   // 2) Enviar redação para correção
@@ -120,19 +128,33 @@ useEffect(() => {
     fd.append("allowed_to_share", allowedToShare === true ? "true" : "false");
 
     try {
-      const res = await fetch("/api/grade2", { method: "POST", body: fd });
+      const res = await fetch("/api/grade2", { method: "POST", body: fd, credentials: "include" });
       const txt = await res.text();
+      // Se sessão expirou ou não está logado
+if (res.status === 401) {
+  alert("Sua sessão expirou (ou você não está logado). Faça login novamente.");
+  await reloadCredits();
+  return;
+}
+
+// Sem crédito
+if (res.status === 402) {
+  alert("Sem créditos disponíveis. Compre créditos para avaliar.");
+  await reloadCredits();
+  return;
+}
 
       let data: GradeResp | null = null;
-      try {
-        data = JSON.parse(txt);
-      } catch {
-        /* se não for JSON, tratamos abaixo */
-      }
+try {
+  data = JSON.parse(txt);
+} catch {
+  // Se não veio JSON, evita estourar HTML inteiro no alert
+  throw new Error(`Falha na avaliação (HTTP ${res.status}).`);
+}
 
-      if (!res.ok || !data) {
-        throw new Error(data?.error || txt);
-      }
+if (!res.ok || !data) {
+  throw new Error(data?.error || `Falha na avaliação (HTTP ${res.status}).`);
+}
 
       await reloadCredits();
       setReport(String(data.report_html || ""));
@@ -510,6 +532,56 @@ useEffect(() => {
   {meLoading ? "carregando..." : (creditsRedacao ?? 0)}
 </div>
 
+{typeof creditsRedacao === "number" && creditsRedacao <= 0 && (
+  <div
+    style={{
+      marginTop: 12,
+      padding: 12,
+      border: "1px solid #ddd",
+      borderRadius: 8,
+      background: "#fff",
+    }}
+  >
+    <div style={{ marginBottom: 10, fontWeight: 600 }}>
+      Você está sem créditos para avaliar redações.
+    </div>
+
+<div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+  <button
+    type="button"
+    onClick={() => window.open(BUY_REDACAO_URL, "_blank", "noopener,noreferrer")}
+    style={{
+      padding: "10px 14px",
+      borderRadius: 8,
+      border: "none",
+      background: "#0f766e",
+      color: "#fff",
+      fontWeight: 700,
+      cursor: "pointer",
+    }}
+  >
+    Comprar créditos
+  </button>
+
+  <button
+    type="button"
+    onClick={reloadCredits}
+    style={{
+      padding: "10px 14px",
+      borderRadius: 8,
+      border: "1px solid #bbb",
+      background: "#fff",
+      fontWeight: 700,
+      cursor: "pointer",
+    }}
+  >
+    Já comprei — atualizar
+  </button>
+</div>
+
+  </div>
+)}
+
 {/* Passo 5: Botão avaliar --------------------------------------- */}
 <div style={{ marginTop: 8 }}>
         {/* Autorização para visualização/divulgação */}
@@ -595,12 +667,7 @@ useEffect(() => {
       </fieldset>
   <button
     type="submit"
-    disabled={
-  loading ||
-  meLoading ||
-  !canSubmit ||
-  (typeof creditsRedacao === "number" && creditsRedacao <= 0)
-}
+disabled={loading || meLoading || !canSubmitFinal}
     style={{
       width: "100%",
       padding: "12px 16px",
@@ -610,17 +677,17 @@ useEffect(() => {
       color: "#fff",
       fontWeight: 700,
       fontSize: 16, // texto um pouco maior
-      cursor: loading || !canSubmit ? "not-allowed" : "pointer",
+      cursor: loading || meLoading || !canSubmitFinal ? "not-allowed" : "pointer",
     }}
   >
-            {
+ {
   loading
     ? "Gerando avaliação..."
     : meLoading
-      ? "Carregando seus créditos..."
+      ? "Carregando..."
       : (typeof creditsRedacao === "number" && creditsRedacao <= 0)
-        ? "Sem créditos — não é possível avaliar"
-        : `5) AVALIAR SUA REDAÇÃO (você tem ${creditsRedacao} crédito${creditsRedacao === 1 ? "" : "s"})`
+        ? "Sem créditos — compre para avaliar"
+        : "5) AVALIAR SUA REDAÇÃO"
 }
           </button>
         </div>

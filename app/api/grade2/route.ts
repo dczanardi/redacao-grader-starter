@@ -12,7 +12,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import crypto from "crypto";
 import { ensureReportsTable, insertReport } from "../../lib/db";
-import { consumeOneCredit, refundOneCredit, getCreditsRemaining } from "@/app/lib/credits";
+import { consumeOneCredit, refundOneCredit } from "@/app/lib/credits";
 import { verifySession } from "@/app/lib/auth";
 import { cookies } from "next/headers";
 const DEBUG = process.env.NODE_ENV !== "production";
@@ -544,13 +544,6 @@ export async function POST(req: Request) {
     if (cache[key]) return NextResponse.json(cache[key]);
 
     // ===== 2) CREDITS (uma vez só) =====
-    const credits = await getCreditsRemaining(email, product);
-    if (credits <= 0) {
-      return NextResponse.json(
-        { error: "Sem créditos disponíveis para avaliar redação." },
-        { status: 402 }
-      );
-    }
 
     reserved = await consumeOneCredit(email, product);
     if (!reserved) {

@@ -1,5 +1,5 @@
 // app/layout.tsx
-
+import "@n8n/chat/style.css";
 export const metadata = {
   title: "Correção de Redação",
   description: "Ferramenta simples para corrigir redações",

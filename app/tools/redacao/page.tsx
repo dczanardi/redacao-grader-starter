@@ -1,6 +1,7 @@
 // app/tools/redacao/page.tsx
 "use client";
-
+import N8nTranscriber from "./transcricao/N8nTranscriber";
+import N8nHelpWidget from "./components/N8nHelpWidget";
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 type MeResponse = {
@@ -192,15 +193,66 @@ if (!res.ok || !data) {
   // --------------------------------------------------
   // 4) Layout da página
   // --------------------------------------------------
-  return (
-  <div 
+     
+return (
+  <>
+    <div
       style={{
-      maxWidth: 980,
-      margin: "0 auto",
-      padding: 16,
-      backgroundColor: "#eef4f7ff", // fundo verdinho suave do cartão
-      borderRadius: 12,            // cantos arredondados
-      }}>
+        display: "flex",
+        justifyContent: "center",
+        gap: 0,
+        background: "#b5ad74", // cor das faixas laterais
+      }}
+    >
+     {/* LATERAL ESQUERDA (faixa marrom) */}
+<div
+  style={{
+    width: 260,
+    padding: 16,
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+
+    // ✅ fica no topo (não desce pro meio)
+    justifyContent: "flex-start",
+    alignItems: "stretch",
+
+    // ✅ “gruda” no topo quando rolar a página
+    position: "sticky",
+    top: 16,
+    height: "fit-content",
+  }}
+>
+  <button
+    type="button"
+    onClick={() => window.open("/reports", "_blank")}
+    style={{
+      width: "100%",
+      padding: "14px 12px",
+      borderRadius: 12,
+      border: "2px solid rgba(255,255,255,0.55)",
+      background: "rgba(255,255,255,0.25)",
+      fontWeight: 800,
+      cursor: "pointer",
+    }}
+  >
+    Meus relatórios
+  </button>
+  <N8nHelpWidget />
+</div>
+
+      {/* CARTÃO CENTRAL (o conteúdo que já existe hoje) */}
+      <div
+        style={{
+          maxWidth: 980,
+          width: "100%",
+          margin: "0 auto",
+          padding: 16,
+          backgroundColor: "#eef4f7ff",
+          borderRadius: 12,
+        }}
+      >
+
     {/* BANNER SUPERIOR --------------------------------------------------- */}
     <div
       style={{
@@ -210,19 +262,23 @@ if (!res.ok || !data) {
         marginBottom: 16,
       }}
     >
+
       <div style={{ flex: "0 0 320px" }}>
         {/* Troque o caminho da imagem se precisar */}
-        <img
-          src="/logo-dcz.png"
-          alt="DCZ Pensando Educação"
-          style={{
-            width: "120%",       // <<< deixei exatamente como você colocou
-            height: "97px",      // <<< idem
-            borderRadius: 8,
-            border: "1px solid #ccc",
-            objectFit: "cover",
-          }}
-        />
+       
+  <img
+  src="/logo-dcz.png"
+  alt="DCZ Pensando Educação"
+  style={{
+    width: "120%",
+    height: "130px",
+    borderRadius: 8,
+    border: "1px solid #ccccccc1",
+    objectFit: "contain",
+    display: "block",
+  }}
+/>
+
       </div>
 
       {/* BOX DO TÍTULO (CORRETOR DE REDAÇÃO) */}
@@ -471,58 +527,7 @@ if (!res.ok || !data) {
               alignSelf: "center",   // <<< esta linha faz a caixa descer/centrar
             }}
           >
-            <h3
-              style={{
-                marginTop: 0,
-                marginBottom: 8,
-                fontSize: 18,
-              }}
-            >
-              Transcrição de redação manuscrita
-            </h3>
-            <p style={{ margin: "0 0 8px" }}>
-              Se a sua redação estiver manuscrita:
-            </p>
-            <ol style={{ margin: 0, paddingLeft: 18 }}>
-              <li>Fotografe ou escaneie a redação.</li>
-              <li>
-                Clique no botão abaixo para abrir o{" "}
-                <b>Transcritor de Redação</b>.
-              </li>
-              <li>
-                Faça o upload da imagem, copie o texto transcrito e cole
-                no campo de redação ao lado.
-              </li>
-            </ol>
-            <p style={{ marginTop: 8, color: "#555" }}>
-            <b>Observação:</b> a transcrição é feita externamente, com o ChatGPT. 
-            A qualidade da transcrição pode variar de acordo com o modelo disponível na sua conta.
-            </p>
-
-            <div style={{ marginTop: 10 }}>
-              {/* TODO: troque o href pelo link real do seu GPT de transcrição */}
-              <a
-                href="https://chatgpt.com/g/g-68cdaa126d30819183fba7761fcd2aa8-transcricao-de-redacao"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-block",
-                  padding: "8px 10px",
-                  borderRadius: 10,
-                  border: "1px solid #2F4F4F",
-                  background: "#2F4F4F",
-                  color: "#fff",
-                  textDecoration: "none",
-                  fontWeight: 600,
-                  fontSize: 14,
-                  textAlign: "center",
-                }}
-              >
-                CLIQUE AQUI PARA TRANSCREVER A SUA REDAÇÃO
-              </a>
-              <p style={{ fontSize: 12, marginTop: 6, color: "#555" }}>
-              </p>
-            </div>
+           <N8nTranscriber setRedacaoText={setEssay} />
           </div>
         </div>
 
@@ -531,6 +536,7 @@ if (!res.ok || !data) {
   <b>Créditos disponíveis:</b>{" "}
   {meLoading ? "carregando..." : (creditsRedacao ?? 0)}
 </div>
+
 
 {typeof creditsRedacao === "number" && creditsRedacao <= 0 && (
   <div
@@ -581,6 +587,26 @@ if (!res.ok || !data) {
 
   </div>
 )}
+
+{/* E-mail do usuário (obrigatório) */}
+<div style={{ marginTop: 12, marginBottom: 12 }}>
+  <label style={{ display: "block", fontWeight: 600 }}>
+    Seu e-mail
+  </label>
+  <input
+    type="email"
+    value={student}
+    onChange={(e) => setStudent(e.target.value)}
+    placeholder="seuemail@email.com"
+    style={{
+      width: "100%",
+      padding: "8px",
+      borderRadius: 6,
+      border: "1px solid #ccc",
+    }}
+  />
+</div>
+
 
 {/* Passo 5: Botão avaliar --------------------------------------- */}
 <div style={{ marginTop: 8 }}>
@@ -741,6 +767,11 @@ disabled={loading || meLoading || !canSubmitFinal}
           />
         </div>
       )}
+      </div>
+
+      {/* LATERAL DIREITA (faixa marrom) */}
+      <div style={{ width: 260 }} />
     </div>
-  );
+  </>
+);
 }

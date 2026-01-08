@@ -6,6 +6,13 @@ import { NextResponse } from "next/server";
 import { verifySessionPayload } from "../../lib/auth";
 import { getCreditsRemaining } from "@/app/lib/credits";
 
+function splitEmails(raw: string) {
+  return raw
+    .split(/[,\n;]/)
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+}
+
 export async function GET(req: Request) {
   const cookieHeader = req.headers.get("cookie") || "";
   const payload = verifySessionPayload(cookieHeader);
@@ -15,6 +22,9 @@ export async function GET(req: Request) {
   }
 
 const email = payload.e;
+const adminRaw = process.env.ADMIN_EMAILS || "";
+const isAdmin = splitEmails(adminRaw).includes(String(email || "").toLowerCase());
+
 const products =
   Array.isArray(payload.products) && payload.products.length
     ? payload.products
@@ -30,6 +40,7 @@ const creditsByProduct = Object.fromEntries(
 return NextResponse.json({
   ok: true,
   email,
+  isAdmin,
   products,
   credits: creditsByProduct,
 });

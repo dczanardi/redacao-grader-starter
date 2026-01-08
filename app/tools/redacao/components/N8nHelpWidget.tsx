@@ -7,7 +7,7 @@ type ChatMsg = {
   content: string;
 };
 
-const WEBHOOK_URL = "https://dczanardi.app.n8n.cloud/webhook/faq-plataforma";
+const WEBHOOK_URL = "/api/faq";
 
 export default function N8nHelpWidget() {
   const [messages, setMessages] = useState<ChatMsg[]>([
@@ -55,24 +55,21 @@ export default function N8nHelpWidget() {
         throw new Error(`HTTP ${res.status}`);
       }
 
-      // 4) Ler a resposta do servidor
-      const data: unknown = await res.json();
+// 4) Ler a resposta do servidor (esperado: { "text": "..." })
+const data: unknown = await res.json().catch(() => null);
 
-      // Esperado: { "text": "..." }
-      const text =
-        typeof data === "object" &&
-        data !== null &&
-        "text" in data &&
-        typeof (data as any).text === "string"
-          ? (data as any).text
-          : "";
+const botText =
+  data &&
+  typeof data === "object" &&
+  "text" in data &&
+  typeof (data as any).text === "string"
+    ? (data as any).text
+    : "Ops! Não consegui obter resposta agora.";
 
-      if (!text) {
-        throw new Error("Resposta sem campo .text");
-      }
+// 5) Mostra a resposta da IA
+setMessages((prev) => [...prev, { role: "assistant", content: botText }]);
 
-      // 5) Mostra a resposta da IA
-      setMessages((prev) => [...prev, { role: "assistant", content: text }]);
+
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -88,14 +85,38 @@ export default function N8nHelpWidget() {
   }
 
   return (
+  <div
+    style={{
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+    }}
+  >
+    {/* CAIXINHA (CARD) QUE ENVOLVE TUDO */}
     <div
       style={{
-        width: "100%",
+        background: "white",
+        borderRadius: 14,
+        padding: 14,
+        border: "1px solid rgba(0,0,0,0.10)",
+        boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
         height: "100%",
         display: "flex",
         flexDirection: "column",
       }}
     >
+      {/* TÍTULO CENTRALIZADO */}
+      <div style={{ textAlign: "center", marginBottom: 12 }}>
+        <div style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.2 }}>
+          Tire suas dúvidas com a IA 
+        </div>
+
+        <div style={{ marginTop: 6, fontSize: 13, opacity: 0.75 }}>
+          
+        </div>
+      </div>
+
       {/* LISTA DE MENSAGENS */}
       <div
         ref={listRef}
@@ -103,7 +124,9 @@ export default function N8nHelpWidget() {
           flex: 1,
           overflowY: "auto",
           padding: 16,
-          background: "rgba(255,255,255,0.92)",
+          background: "rgba(0,0,0,0.02)",
+          borderRadius: 12,
+          border: "1px solid rgba(0,0,0,0.06)",
         }}
       >
         {messages.map((m, idx) => (
@@ -145,8 +168,10 @@ export default function N8nHelpWidget() {
           display: "flex",
           gap: 10,
           padding: 12,
+          marginTop: 12,
           borderTop: "1px solid rgba(0,0,0,0.08)",
           background: "rgba(255,255,255,0.98)",
+          borderRadius: 12,
         }}
       >
         <input
@@ -158,9 +183,10 @@ export default function N8nHelpWidget() {
           placeholder="Digite sua dúvida aqui…"
           style={{
             flex: 1,
+            minWidth: 0, // ✅ evita o “estouro” do layout
             padding: "12px 12px",
             borderRadius: 10,
-            border: "1px solid rgba(0,0,0,0.15)",
+            border: "3px solid rgba(0,0,0,0.15)",
             outline: "none",
           }}
           disabled={loading} // ✅ bloqueio do campo enquanto responde
@@ -178,11 +204,14 @@ export default function N8nHelpWidget() {
             fontWeight: 800,
             cursor: loading || !input.trim() ? "not-allowed" : "pointer",
             opacity: loading || !input.trim() ? 0.6 : 1,
+            flexShrink: 0, // ✅ não deixa o botão “espremido”
+            whiteSpace: "nowrap", // ✅ não quebra “Enviar”
           }}
         >
           Enviar
         </button>
       </div>
     </div>
-  );
+  </div>
+);
 }

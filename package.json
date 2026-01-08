@@ -8,7 +8,6 @@
     "start": "next start"
   },
   "dependencies": {
-    "@n8n/chat": "^1.3.0",
     "@sparticuz/chromium": "^138.0.2",
     "dotenv": "^17.2.3",
     "next": "14.2.35",

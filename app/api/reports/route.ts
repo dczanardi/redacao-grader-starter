@@ -4,6 +4,15 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
+import { verifySessionPayload } from "../../lib/auth";
+
+function splitEmails(raw: string) {
+  return raw
+    .split(/[,\n\r\s]+/g)
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+}
+
 
 const pool = new Pool({
   connectionString:
@@ -14,6 +23,19 @@ const pool = new Pool({
 });
 
 export async function GET(req: Request) {
+  const cookieHeader = req.headers.get("cookie") || "";
+const payload = verifySessionPayload(cookieHeader);
+
+if (!payload) return NextResponse.json({ ok: false }, { status: 401 });
+
+const email = String(payload.e || "").toLowerCase();
+const url = new URL(req.url);
+const scope = url.searchParams.get("scope"); // "all" => admin
+const adminListRaw = process.env.ADMIN_EMAILS ?? process.env.ALLOWED_EMAILS ?? "";
+const adminEmails = splitEmails(adminListRaw);
+const isAdmin = email && adminEmails.includes(email);
+
+
   try {
     const { searchParams } = new URL(req.url);
 
@@ -51,6 +73,17 @@ export async function GET(req: Request) {
         `(COALESCE(student_name,'') ILIKE ${p} OR COALESCE(student_identifier,'') ILIKE ${p} OR COALESCE(rubric,'') ILIKE ${p})`
       );
     }
+
+    // filtro de dono (meus relatórios) — só libera "all" para admin
+if (scope === "all") {
+  if (!isAdmin) {
+    return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
+  }
+} else {
+  // usuário comum: vê apenas os próprios relatórios
+  params.push(email);
+  whereParts.push(`owner_email = $${params.length}`);
+}
 
     const whereSQL = whereParts.length ? `WHERE ${whereParts.join(" AND ")}` : "";
 

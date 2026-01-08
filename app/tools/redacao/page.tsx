@@ -33,6 +33,7 @@ export default function Redacao() {
   const [rubrics, setRubrics] = useState<string[]>([]);
   const [rubric, setRubric] = useState("");
   const [student, setStudent] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const [proposalText, setProposalText] = useState("");
   const [proposalFile, setProposalFile] = useState<File | null>(null);
   const [essay, setEssay] = useState("");
@@ -43,6 +44,22 @@ export default function Redacao() {
   const [consentError, setConsentError] = useState<string | null>(null);
   const [creditsRedacao, setCreditsRedacao] = useState<number | null>(null);
 const [meLoading, setMeLoading] = useState(true);
+useEffect(() => {
+  (async () => {
+    const res = await fetch("/api/me", { cache: "no-store" });
+    const data = await res.json().catch(() => ({}));
+
+    if (data?.ok && data?.email) {
+      setUserEmail(String(data.email));
+
+      const redacaoCredits = data?.credits?.redacao;
+      if (typeof redacaoCredits === "number") setCreditsRedacao(redacaoCredits);
+    }
+
+    setMeLoading(false);
+  })();
+}, []);
+
 // --- créditos ---
 const creditsValue = typeof creditsRedacao === "number" ? creditsRedacao : 0;
 const hasCredits = creditsValue > 0;
@@ -197,17 +214,20 @@ if (!res.ok || !data) {
 return (
   <>
     <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: 0,
-        background: "#b5ad74", // cor das faixas laterais
-      }}
-    >
+  style={{
+    display: "flex",
+    justifyContent: "flex-start", // ✅ não centraliza mais
+    gap: 16,                      // ✅ dá respiro entre colunas
+    background: "#b5ad74",
+    width: "100%",                // ✅ ocupa a tela toda
+    padding: "0 18px",            // ✅ margem interna pequena
+    boxSizing: "border-box",
+  }}
+>
      {/* LATERAL ESQUERDA (faixa marrom) */}
 <div
   style={{
-    width: 260,
+    width: 380,
     padding: 16,
     display: "flex",
     flexDirection: "column",
@@ -227,31 +247,142 @@ return (
     type="button"
     onClick={() => window.open("/reports", "_blank")}
     style={{
-      width: "100%",
-      padding: "14px 12px",
-      borderRadius: 12,
-      border: "2px solid rgba(255,255,255,0.55)",
-      background: "rgba(255,255,255,0.25)",
-      fontWeight: 800,
-      cursor: "pointer",
-    }}
+  width: "100%",
+  padding: "18px 14px",                 // ✅ botão mais alto
+  borderRadius: 14,
+  border: "4px solid rgba(255,255,255,0.55)",
+  background: "rgba(255,255,255,0.25)",
+  fontWeight: 900,
+  fontSize: 30,                          // ✅ fonte maior
+  letterSpacing: 0.2,
+  cursor: "pointer",
+}}
   >
     Meus relatórios
   </button>
   <N8nHelpWidget />
+
+{/* ✅ BOX CRÉDITOS + EMAIL (foi do miolo para a lateral) */}
+
+<div
+  style={{
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 14,
+    background: "rgba(255,255,255,0.92)",
+    border: "1px solid rgba(0,0,0,0.08)",
+  }}
+>
+
+{/* CAIXA: E-mail + Créditos (sempre visível) */}
+<div
+  style={{
+    background: "rgba(255,255,255,0.9)",
+    borderRadius: 16,
+    padding: 14,
+    border: "1px solid rgba(0,0,0,0.08)",
+  }}
+>
+  {/* E-mail do usuário (sempre visível) */}
+  <div style={{ marginBottom: 12 }}>
+    <label style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
+      Seu e-mail
+    </label>
+    <input
+      type="email"
+      value={userEmail}
+      readOnly
+      placeholder="seuemail@email.com"
+      style={{
+        width: "100%",
+        padding: "10px 10px",
+        borderRadius: 10,
+        border: "1px solid rgba(0,0,0,0.18)",
+        outline: "none",
+        boxSizing: "border-box",
+      }}
+    />
+  </div>
+
+  {/* Créditos disponíveis (sempre visível) */}
+  <div style={{ opacity: meLoading ? 0.7 : 1, fontWeight: 700 }}>
+    Créditos disponíveis:{" "}
+    <span style={{ fontWeight: 800 }}>
+      {meLoading ? "carregando..." : (creditsRedacao ?? 0)}
+    </span>
+  </div>
+</div>
+
+</div>
+
+
+{typeof creditsRedacao === "number" && creditsRedacao <= 0 && (
+  <div
+    style={{
+      marginTop: 12,
+      padding: 12,
+      border: "1px solid #ddd",
+      borderRadius: 8,
+      background: "#fff",
+    }}
+  >
+    <div style={{ marginBottom: 10, fontWeight: 600 }}>
+      Você está sem créditos para avaliar redações.
+    </div>
+
+<div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+  <button
+    type="button"
+    onClick={() => window.open(BUY_REDACAO_URL, "_blank", "noopener,noreferrer")}
+    style={{
+      padding: "10px 14px",
+      borderRadius: 8,
+      border: "none",
+      background: "#0f766e",
+      color: "#fff",
+      fontWeight: 700,
+      cursor: "pointer",
+    }}
+  >
+    Comprar créditos
+  </button>
+
+  <button
+    type="button"
+    onClick={reloadCredits}
+    style={{
+      padding: "10px 14px",
+      borderRadius: 8,
+      border: "1px solid #bbb",
+      background: "#fff",
+      fontWeight: 700,
+      cursor: "pointer",
+    }}
+  >
+    Já comprei — atualizar
+  </button>
+</div>
+
+  </div>
+)}
+
+
+
+  
 </div>
 
       {/* CARTÃO CENTRAL (o conteúdo que já existe hoje) */}
       <div
-        style={{
-          maxWidth: 980,
-          width: "100%",
-          margin: "0 auto",
-          padding: 16,
-          backgroundColor: "#eef4f7ff",
-          borderRadius: 12,
-        }}
-      >
+  style={{
+    flex: 1,                 // ✅ deixa o centro ocupar o espaço disponível
+    maxWidth: 1280,          // ✅ mais largo (empurra pra direita)
+    width: "100%",
+    margin: 0,               // ✅ não centraliza com auto
+    padding: 16,
+    backgroundColor: "#eef4f7ff",
+    borderRadius: 12,
+  }}
+>
 
     {/* BANNER SUPERIOR --------------------------------------------------- */}
     <div
@@ -532,80 +663,6 @@ return (
         </div>
 
         
-<div style={{ margin: "10px 0", opacity: meLoading ? 0.7 : 1 }}>
-  <b>Créditos disponíveis:</b>{" "}
-  {meLoading ? "carregando..." : (creditsRedacao ?? 0)}
-</div>
-
-
-{typeof creditsRedacao === "number" && creditsRedacao <= 0 && (
-  <div
-    style={{
-      marginTop: 12,
-      padding: 12,
-      border: "1px solid #ddd",
-      borderRadius: 8,
-      background: "#fff",
-    }}
-  >
-    <div style={{ marginBottom: 10, fontWeight: 600 }}>
-      Você está sem créditos para avaliar redações.
-    </div>
-
-<div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-  <button
-    type="button"
-    onClick={() => window.open(BUY_REDACAO_URL, "_blank", "noopener,noreferrer")}
-    style={{
-      padding: "10px 14px",
-      borderRadius: 8,
-      border: "none",
-      background: "#0f766e",
-      color: "#fff",
-      fontWeight: 700,
-      cursor: "pointer",
-    }}
-  >
-    Comprar créditos
-  </button>
-
-  <button
-    type="button"
-    onClick={reloadCredits}
-    style={{
-      padding: "10px 14px",
-      borderRadius: 8,
-      border: "1px solid #bbb",
-      background: "#fff",
-      fontWeight: 700,
-      cursor: "pointer",
-    }}
-  >
-    Já comprei — atualizar
-  </button>
-</div>
-
-  </div>
-)}
-
-{/* E-mail do usuário (obrigatório) */}
-<div style={{ marginTop: 12, marginBottom: 12 }}>
-  <label style={{ display: "block", fontWeight: 600 }}>
-    Seu e-mail
-  </label>
-  <input
-    type="email"
-    value={student}
-    onChange={(e) => setStudent(e.target.value)}
-    placeholder="seuemail@email.com"
-    style={{
-      width: "100%",
-      padding: "8px",
-      borderRadius: 6,
-      border: "1px solid #ccc",
-    }}
-  />
-</div>
 
 
 {/* Passo 5: Botão avaliar --------------------------------------- */}
@@ -770,7 +827,7 @@ disabled={loading || meLoading || !canSubmitFinal}
       </div>
 
       {/* LATERAL DIREITA (faixa marrom) */}
-      <div style={{ width: 260 }} />
+      <div style={{ width: 24 }} />
     </div>
   </>
 );

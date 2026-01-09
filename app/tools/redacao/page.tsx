@@ -259,7 +259,7 @@ return (
     <div
   style={{
     display: "flex",
-    justifyContent: "flex-start", // ✅ não centraliza mais
+    justifyContent: "center", // ✅ não centraliza mais
     gap: 16,                      // ✅ dá respiro entre colunas
     background: "#b5ad74",
     width: "100%",                // ✅ ocupa a tela toda
@@ -426,7 +426,8 @@ return (
     </div>
   </div>
 )}
-  
+
+</div>  
 </div>
 
       {/* CARTÃO CENTRAL (o conteúdo que já existe hoje) */}
@@ -678,15 +679,16 @@ return (
         </div>
 
         {/* Passo 4: Redação + botão de transcrição ----------------------- */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(0,3fr) minmax(0,2fr)",
-            gap: 16,
-            alignItems: "flex-start",
-          }}
-        >
-          <label style={{ fontSize: 14 }}>
+<div
+  style={{
+    display: "flex",
+    gap: 16,
+    alignItems: "flex-start",
+    flexWrap: "wrap",
+  }}
+>
+
+          <label style={{ fontSize: 14, flex: "1 1 520px", minWidth: 320 }}>
             <b>4) Redação:</b>
             <textarea
               value={essay}
@@ -695,7 +697,7 @@ return (
               style={{
                 display: "block",
                 marginTop: 4,
-                width: "102%",
+                width: "100%",
                 padding: "4px 6px",
                 boxSizing: "border-box",
                 border: "1px solid #ccc",
@@ -706,16 +708,20 @@ return (
             />
           </label>
 
-          <div
-            style={{
-              borderRadius: 16,
-              border: "2px dashed #1b3333ff",
-              padding: 10,
-              background: "rgba(47,79,79,0.05)",
-              fontSize: 12,
-              alignSelf: "center",   // <<< esta linha faz a caixa descer/centrar
-            }}
-          >
+<div
+  style={{
+    flex: "0 1 380px",
+    minWidth: 300,
+    maxWidth: "100%",
+    borderRadius: 16,
+    border: "2px dashed #1b3333ff",
+    padding: 10,
+    background: "rgba(47,79,79,0.05)",
+    fontSize: 12,
+    alignSelf: "stretch",
+  }}
+>
+
            <N8nTranscriber setRedacaoText={setEssay} />
           </div>
         </div>
@@ -887,6 +893,5 @@ disabled={loading || meLoading || !canSubmitFinal}
       {/* LATERAL DIREITA (faixa marrom) */}
       <div style={{ width: 24 }} />
     </div>
-  </div>
 );
 }

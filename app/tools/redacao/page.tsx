@@ -26,10 +26,26 @@ async function fetchMe(): Promise<MeResponse> {
 type RubricListResp = { items?: { id: string; file: string }[]; error?: string };
 type GradeResp = { ok?: boolean; report_html?: string; total?: number; error?: string };
 
-const BUY_REDACAO_URL =
-  process.env.NEXT_PUBLIC_BUY_REDACAO_URL || "https://mpago.la/19QsBE1";
 
 export default function Redacao() {
+  async function comprarCreditos(qty: 1 | 3 | 5) {
+  const res = await fetch("/api/mp/create-preference", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ qty }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  const url = data?.url || data?.sandbox_init_point || data?.init_point;
+  if (!url) {
+    alert("Erro ao iniciar pagamento. Tente novamente.");
+    return;
+  }
+
+  window.location.href = url;
+}
+
   const [rubrics, setRubrics] = useState<string[]>([]);
   const [rubric, setRubric] = useState("");
   const [student, setStudent] = useState("");
@@ -78,6 +94,32 @@ async function reloadCredits() {
 useEffect(() => {
   reloadCredits();
 }, []);
+
+async function startCheckout(qty: 1 | 3 | 5) {
+  try {
+    const res = await fetch("/api/mp/create-preference", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ qty }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    const url = data?.init_point || data?.sandbox_init_point;
+    if (!res.ok || !url) {
+      alert(
+        "Não consegui abrir o pagamento. " +
+          (data?.error ? `Detalhe: ${data.error}` : "")
+      );
+      return;
+    }
+
+    window.open(url, "_blank", "noopener,noreferrer");
+  } catch (e: any) {
+    alert("Erro ao iniciar pagamento: " + (e?.message || String(e)));
+  }
+}
 
 
   // --------------------------------------------------
@@ -211,8 +253,9 @@ if (!res.ok || !data) {
   // 4) Layout da página
   // --------------------------------------------------
      
+
 return (
-  <>
+  
     <div
   style={{
     display: "flex",
@@ -274,47 +317,34 @@ return (
   }}
 >
 
-{/* CAIXA: E-mail + Créditos (sempre visível) */}
-<div
-  style={{
-    background: "rgba(255,255,255,0.9)",
-    borderRadius: 16,
-    padding: 14,
-    border: "1px solid rgba(0,0,0,0.08)",
-  }}
->
-  {/* E-mail do usuário (sempre visível) */}
-  <div style={{ marginBottom: 12 }}>
-    <label style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
-      Seu e-mail
-    </label>
-    <input
-      type="email"
-      value={userEmail}
-      readOnly
-      placeholder="seuemail@email.com"
-      style={{
-        width: "100%",
-        padding: "10px 10px",
-        borderRadius: 10,
-        border: "1px solid rgba(0,0,0,0.18)",
-        outline: "none",
-        boxSizing: "border-box",
-      }}
-    />
-  </div>
-
-  {/* Créditos disponíveis (sempre visível) */}
-  <div style={{ opacity: meLoading ? 0.7 : 1, fontWeight: 700 }}>
-    Créditos disponíveis:{" "}
-    <span style={{ fontWeight: 800 }}>
-      {meLoading ? "carregando..." : (creditsRedacao ?? 0)}
-    </span>
-  </div>
+{/* E-mail do usuário (sempre visível) */}
+<div style={{ marginBottom: 12 }}>
+  <label style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
+    Seu e-mail
+  </label>
+  <input
+    type="email"
+    value={userEmail}
+    readOnly
+    placeholder="seuemail@email.com"
+    style={{
+      width: "100%",
+      padding: "10px 10px",
+      borderRadius: 10,
+      border: "1px solid rgba(0,0,0,0.18)",
+      outline: "none",
+      boxSizing: "border-box",
+    }}
+  />
 </div>
 
+{/* Créditos disponíveis (sempre visível) */}
+<div style={{ opacity: meLoading ? 0.7 : 1, fontWeight: 700 }}>
+  Créditos disponíveis:{" "}
+  <span style={{ fontWeight: 800 }}>
+    {meLoading ? "carregando..." : (creditsRedacao ?? 0)}
+  </span>
 </div>
-
 
 {typeof creditsRedacao === "number" && creditsRedacao <= 0 && (
   <div
@@ -330,44 +360,72 @@ return (
       Você está sem créditos para avaliar redações.
     </div>
 
-<div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-  <button
-    type="button"
-    onClick={() => window.open(BUY_REDACAO_URL, "_blank", "noopener,noreferrer")}
-    style={{
-      padding: "10px 14px",
-      borderRadius: 8,
-      border: "none",
-      background: "#0f766e",
-      color: "#fff",
-      fontWeight: 700,
-      cursor: "pointer",
-    }}
-  >
-    Comprar créditos
-  </button>
+    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+      <button
+        type="button"
+        onClick={() => startCheckout(1)}
+        style={{
+          padding: "10px 14px",
+          borderRadius: 8,
+          border: "none",
+          background: "#0f766e",
+          color: "#fff",
+          fontWeight: 700,
+          cursor: "pointer",
+        }}
+      >
+        Comprar 1 crédito
+      </button>
 
-  <button
-    type="button"
-    onClick={reloadCredits}
-    style={{
-      padding: "10px 14px",
-      borderRadius: 8,
-      border: "1px solid #bbb",
-      background: "#fff",
-      fontWeight: 700,
-      cursor: "pointer",
-    }}
-  >
-    Já comprei — atualizar
-  </button>
-</div>
+      <button
+        type="button"
+        onClick={() => startCheckout(3)}
+        style={{
+          padding: "10px 14px",
+          borderRadius: 8,
+          border: "none",
+          background: "#0f766e",
+          color: "#fff",
+          fontWeight: 700,
+          cursor: "pointer",
+        }}
+      >
+        Comprar 3 créditos
+      </button>
 
+      <button
+        type="button"
+        onClick={() => startCheckout(5)}
+        style={{
+          padding: "10px 14px",
+          borderRadius: 8,
+          border: "none",
+          background: "#0f766e",
+          color: "#fff",
+          fontWeight: 700,
+          cursor: "pointer",
+        }}
+      >
+        Comprar 5 créditos
+      </button>
+
+      <button
+        type="button"
+        onClick={reloadCredits}
+        style={{
+          padding: "10px 14px",
+          borderRadius: 8,
+          border: "1px solid #bbb",
+          background: "#fff",
+          fontWeight: 700,
+          cursor: "pointer",
+        }}
+      >
+        Já comprei — atualizar
+      </button>
+    </div>
   </div>
 )}
-
-
-
   
 </div>
 
@@ -829,6 +887,6 @@ disabled={loading || meLoading || !canSubmitFinal}
       {/* LATERAL DIREITA (faixa marrom) */}
       <div style={{ width: 24 }} />
     </div>
-  </>
+  </div>
 );
 }

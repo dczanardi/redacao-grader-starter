@@ -274,8 +274,8 @@ if (!res.ok || !data) {
   // --------------------------------------------------
   // 4) Layout da página
   // --------------------------------------------------
-  const isMobile =
-  typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches;
+const isMobile = isNarrow;
+
 
 return (
   
@@ -289,7 +289,7 @@ return (
     width: "100%",                // ✅ ocupa a tela toda
     padding: "0 18px",            // ✅ margem interna pequena
     boxSizing: "border-box",
-    overflowX: "hidden",
+    overflowX: "visible",
     maxWidth: "100%",
   }}
 >

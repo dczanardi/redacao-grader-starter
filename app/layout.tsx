@@ -1,9 +1,15 @@
 // app/layout.tsx
 
 import AppHeader from "./components/AppHeader";
+
 export const metadata = {
   title: "Correção de Redação",
   description: "Ferramenta simples para corrigir redações",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

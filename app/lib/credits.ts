@@ -44,3 +44,21 @@ export async function refundOneCredit(email: string, product: string): Promise<b
 
   return rowCount === 1;
 }
+
+// Soma créditos (ex.: +1, +3, +5...) e cria a linha se ainda não existir
+export async function addCredits(email: string, product: string, amount: number): Promise<number> {
+  const { rows } = await pool.query(
+    `
+    insert into product_credits (email, product, credits_remaining)
+    values ($1, $2, $3)
+    on conflict (email, product)
+    do update
+      set credits_remaining = product_credits.credits_remaining + $3,
+          updated_at = now()
+    returning credits_remaining
+    `,
+    [email, product, amount]
+  );
+
+  return rows[0]?.credits_remaining ?? 0;
+}

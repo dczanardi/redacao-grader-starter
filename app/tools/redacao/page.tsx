@@ -60,6 +60,7 @@ export default function Redacao() {
   const [consentError, setConsentError] = useState<string | null>(null);
   const [creditsRedacao, setCreditsRedacao] = useState<number | null>(null);
 const [meLoading, setMeLoading] = useState(true);
+const [isNarrow, setIsNarrow] = useState(false);
 useEffect(() => {
   (async () => {
     const res = await fetch("/api/me", { cache: "no-store" });
@@ -75,6 +76,27 @@ useEffect(() => {
     setMeLoading(false);
   })();
 }, []);
+
+useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  const mq = window.matchMedia("(max-width: 900px)");
+
+  const apply = () => setIsNarrow(mq.matches);
+  apply();
+
+  // compat: alguns browsers antigos
+  if (typeof mq.addEventListener === "function") {
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  } else {
+    // @ts-ignore
+    mq.addListener(apply);
+    // @ts-ignore
+    return () => mq.removeListener(apply);
+  }
+}, []);
+
 
 // --- créditos ---
 const creditsValue = typeof creditsRedacao === "number" ? creditsRedacao : 0;
@@ -252,25 +274,29 @@ if (!res.ok || !data) {
   // --------------------------------------------------
   // 4) Layout da página
   // --------------------------------------------------
-     
+  const isMobile =
+  typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches;
 
 return (
   
     <div
   style={{
     display: "flex",
+    flexDirection: isMobile ? "column" : "row",
     justifyContent: "center", // ✅ não centraliza mais
     gap: 16,                      // ✅ dá respiro entre colunas
     background: "#b5ad74",
     width: "100%",                // ✅ ocupa a tela toda
     padding: "0 18px",            // ✅ margem interna pequena
     boxSizing: "border-box",
+    overflowX: "hidden",
+    maxWidth: "100%",
   }}
 >
      {/* LATERAL ESQUERDA (faixa marrom) */}
 <div
   style={{
-    width: 380,
+    width: isMobile ? "100%" : 380,
     padding: 16,
     display: "flex",
     flexDirection: "column",
@@ -281,7 +307,7 @@ return (
     alignItems: "stretch",
 
     // ✅ “gruda” no topo quando rolar a página
-    position: "sticky",
+    position: isMobile ? "relative" : "sticky",
     top: 16,
     height: "fit-content",
   }}
@@ -363,85 +389,134 @@ return (
     <div
   style={{
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
+    gridTemplateColumns: "1fr",
     gap: 10,
-    alignItems: "start",
+    marginTop: 10,
   }}
 >
-  {/* esquerda: comprar */}
-  <div style={{ display: "grid", gap: 10 }}>
-    <button
-      type="button"
-      onClick={() => startCheckout(1)}
-      style={{
-        padding: "10px 14px",
-        borderRadius: 8,
-        border: "none",
-        background: "#0f766e",
-        color: "#fff",
-        fontWeight: 700,
-        cursor: "pointer",
-        width: "100%",
-      }}
-    >
-      Comprar 1 crédito
-    </button>
+  <button
+    type="button"
+    onClick={() => startCheckout(1)}
+    style={{
+      width: "100%",
+      padding: "12px 14px",
+      borderRadius: 10,
+      border: "none",
+      background: "#0f766e",
+      color: "#fff",
+      fontWeight: 800,
+      cursor: "pointer",
+    }}
+  >
+    Comprar 1 crédito — R$ 9,90
+  </button>
 
-    <button
-      type="button"
-      onClick={() => startCheckout(3)}
-      style={{
-        padding: "10px 14px",
-        borderRadius: 8,
-        border: "none",
-        background: "#0f766e",
-        color: "#fff",
-        fontWeight: 700,
-        cursor: "pointer",
-        width: "100%",
-      }}
-    >
-      Comprar 3 créditos
-    </button>
+  <button
+    type="button"
+    onClick={() => startCheckout(3)}
+    style={{
+      width: "100%",
+      padding: "12px 14px",
+      borderRadius: 10,
+      border: "none",
+      background: "#0f766e",
+      color: "#fff",
+      fontWeight: 800,
+      cursor: "pointer",
+    }}
+  >
+    Comprar 3 créditos — R$ 26,90
+  </button>
 
-    <button
-      type="button"
-      onClick={() => startCheckout(5)}
-      style={{
-        padding: "10px 14px",
-        borderRadius: 8,
-        border: "none",
-        background: "#0f766e",
-        color: "#fff",
-        fontWeight: 700,
-        cursor: "pointer",
-        width: "100%",
-      }}
-    >
-      Comprar 5 créditos
-    </button>
-  </div>
+  <button
+    type="button"
+    onClick={() => startCheckout(5)}
+    style={{
+      width: "100%",
+      padding: "12px 14px",
+      borderRadius: 10,
+      border: "none",
+      background: "#0f766e",
+      color: "#fff",
+      fontWeight: 800,
+      cursor: "pointer",
+    }}
+  >
+    Comprar 5 créditos — R$ 41,90
+  </button>
 
-  {/* direita: atualizar */}
-  <div>
-    <button
-      type="button"
-      onClick={reloadCredits}
-      style={{
-        padding: "10px 14px",
-        borderRadius: 8,
-        border: "1px solid #bbb",
-        background: "#fff",
-        fontWeight: 700,
-        cursor: "pointer",
-        width: "100%",
-      }}
-    >
-      Já comprei: Atualizar
-    </button>
-    </div>
-  </div>
+  {/* Em breve */}
+  <button
+    type="button"
+    disabled
+    style={{
+      width: "100%",
+      padding: "12px 14px",
+      borderRadius: 10,
+      border: "1px solid #cbd5e1",
+      background: "#e5e7eb",
+      color: "#6b7280",
+      fontWeight: 800,
+      cursor: "not-allowed",
+    }}
+  >
+    Comprar 10 créditos (em breve)
+  </button>
+
+  <button
+    type="button"
+    disabled
+    style={{
+      width: "100%",
+      padding: "12px 14px",
+      borderRadius: 10,
+      border: "1px solid #cbd5e1",
+      background: "#e5e7eb",
+      color: "#6b7280",
+      fontWeight: 800,
+      cursor: "not-allowed",
+    }}
+  >
+    Comprar 50 créditos (em breve)
+  </button>
+
+  <button
+    type="button"
+    disabled
+    style={{
+      width: "100%",
+      padding: "12px 14px",
+      borderRadius: 10,
+      border: "1px solid #cbd5e1",
+      background: "#e5e7eb",
+      color: "#6b7280",
+      fontWeight: 800,
+      cursor: "not-allowed",
+    }}
+  >
+    Comprar 100 créditos (em breve)
+  </button>
+
+  {/* Botão atualizar abaixo de tudo */}
+  <button
+    type="button"
+    onClick={reloadCredits}
+    style={{
+      width: "100%",
+      padding: "12px 14px",
+      borderRadius: 10,
+      border: "1px solid #bbb",
+      background: "#fff",
+      fontWeight: 900,
+      cursor: "pointer",
+      marginTop: 6,
+    }}
+  >
+    Já comprei — atualizar
+  </button>
 </div>
+
+  </div>
 
 )}
 
@@ -478,7 +553,7 @@ return (
   src="/logo-dcz.png"
   alt="DCZ Pensando Educação"
   style={{
-    width: "120%",
+    width: isMobile ? "100%" : "120%",
     height: "130px",
     borderRadius: 8,
     border: "1px solid #ccccccc1",
@@ -698,12 +773,21 @@ return (
 
 {/* Passo 4: Redação + botão de transcrição ----------------------- */}
 <div
-  style={{
-    display: "grid",
-    gridTemplateColumns: "minmax(0, 3fr) minmax(0, 2fr)",
-    gap: 16,
-    alignItems: "start",
-  }}
+  style={
+    isNarrow
+      ? {
+          display: "flex",
+          flexDirection: "column",
+          gap: 12,
+          alignItems: "stretch",
+        }
+      : {
+          display: "grid",
+          gridTemplateColumns: "minmax(0,3fr) minmax(0,2fr)",
+          gap: 16,
+          alignItems: "flex-start",
+        }
+  }
 >
   <label style={{ fontSize: 14 }}>
     <b>4) Redação:</b>
@@ -725,34 +809,26 @@ return (
     />
   </label>
 
-  {/* Wrapper só para posicionar à direita (SEM borda, sem pontilhado) */}
-<div
-  style={{
-    // mantém à direita e “tamanho natural” (não estica)
-    alignSelf: "start",
-    height: "fit-content",
-    boxSizing: "border-box",
+  <div
+    style={{
+      borderRadius: 16,
+      border: "2px dashed #1b3333ff",
+      padding: 10,
+      background: "rgba(47,79,79,0.05)",
+      fontSize: 12,
 
-    // alinhamento visual com o topo do textarea (por causa do "4) Redação:")
-    marginTop: 22,
+      // desktop: fica do lado direito, alinhado no topo
+      ...(isNarrow ? {} : { alignSelf: "flex-start" }),
 
-    // duplo pontilhado SEM criar “vazio” enorme
-    borderRadius: 18,
-    border: "2px dashed #1b3333ff",
-    outlineOffset: "-10px",
-
-    // espaço interno
-    padding: 12,
-
-    // fundo e texto
-    background: "rgba(47,79,79,0.05)",
-    fontSize: 12,
-  }}
->
-  <N8nTranscriber setRedacaoText={setEssay} />
+      // mobile: fica embaixo e centralizado
+      ...(isNarrow
+        ? { width: "100%", maxWidth: 720, margin: "0 auto" }
+        : {}),
+    }}
+  >
+    <N8nTranscriber setRedacaoText={setEssay} />
+  </div>
 </div>
-</div>        
-
 
 {/* Passo 5: Botão avaliar --------------------------------------- */}
 <div style={{ marginTop: 8 }}>
@@ -916,7 +992,7 @@ disabled={loading || meLoading || !canSubmitFinal}
       </div>
 
       {/* LATERAL DIREITA (faixa marrom) */}
-      <div style={{ width: 24 }} />
+      <div style={{ width: isMobile ? 0 : 24 }} />
     </div>
 );
 }

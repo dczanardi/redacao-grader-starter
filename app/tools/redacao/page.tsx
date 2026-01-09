@@ -360,71 +360,89 @@ return (
       Você está sem créditos para avaliar redações.
     </div>
 
-    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-      <button
-        type="button"
-        onClick={() => startCheckout(1)}
-        style={{
-          padding: "10px 14px",
-          borderRadius: 8,
-          border: "none",
-          background: "#0f766e",
-          color: "#fff",
-          fontWeight: 700,
-          cursor: "pointer",
-        }}
-      >
-        Comprar 1 crédito
-      </button>
+    <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 10,
+    alignItems: "start",
+  }}
+>
+  {/* esquerda: comprar */}
+  <div style={{ display: "grid", gap: 10 }}>
+    <button
+      type="button"
+      onClick={() => startCheckout(1)}
+      style={{
+        padding: "10px 14px",
+        borderRadius: 8,
+        border: "none",
+        background: "#0f766e",
+        color: "#fff",
+        fontWeight: 700,
+        cursor: "pointer",
+        width: "100%",
+      }}
+    >
+      Comprar 1 crédito
+    </button>
 
-      <button
-        type="button"
-        onClick={() => startCheckout(3)}
-        style={{
-          padding: "10px 14px",
-          borderRadius: 8,
-          border: "none",
-          background: "#0f766e",
-          color: "#fff",
-          fontWeight: 700,
-          cursor: "pointer",
-        }}
-      >
-        Comprar 3 créditos
-      </button>
+    <button
+      type="button"
+      onClick={() => startCheckout(3)}
+      style={{
+        padding: "10px 14px",
+        borderRadius: 8,
+        border: "none",
+        background: "#0f766e",
+        color: "#fff",
+        fontWeight: 700,
+        cursor: "pointer",
+        width: "100%",
+      }}
+    >
+      Comprar 3 créditos
+    </button>
 
-      <button
-        type="button"
-        onClick={() => startCheckout(5)}
-        style={{
-          padding: "10px 14px",
-          borderRadius: 8,
-          border: "none",
-          background: "#0f766e",
-          color: "#fff",
-          fontWeight: 700,
-          cursor: "pointer",
-        }}
-      >
-        Comprar 5 créditos
-      </button>
+    <button
+      type="button"
+      onClick={() => startCheckout(5)}
+      style={{
+        padding: "10px 14px",
+        borderRadius: 8,
+        border: "none",
+        background: "#0f766e",
+        color: "#fff",
+        fontWeight: 700,
+        cursor: "pointer",
+        width: "100%",
+      }}
+    >
+      Comprar 5 créditos
+    </button>
+  </div>
 
-      <button
-        type="button"
-        onClick={reloadCredits}
-        style={{
-          padding: "10px 14px",
-          borderRadius: 8,
-          border: "1px solid #bbb",
-          background: "#fff",
-          fontWeight: 700,
-          cursor: "pointer",
-        }}
-      >
-        Já comprei — atualizar
-      </button>
+  {/* direita: atualizar */}
+  <div>
+    <button
+      type="button"
+      onClick={reloadCredits}
+      style={{
+        padding: "10px 14px",
+        borderRadius: 8,
+        border: "1px solid #bbb",
+        background: "#fff",
+        fontWeight: 700,
+        cursor: "pointer",
+        width: "100%",
+      }}
+    >
+      Já comprei: Atualizar
+    </button>
     </div>
   </div>
+</div>
+
 )}
 
 </div>  
@@ -678,55 +696,62 @@ return (
           </div>
         </div>
 
-        {/* Passo 4: Redação + botão de transcrição ----------------------- */}
+{/* Passo 4: Redação + botão de transcrição ----------------------- */}
 <div
   style={{
-    display: "flex",
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 3fr) minmax(0, 2fr)",
     gap: 16,
-    alignItems: "flex-start",
-    flexWrap: "wrap",
+    alignItems: "start",
   }}
 >
+  <label style={{ fontSize: 14 }}>
+    <b>4) Redação:</b>
+    <textarea
+      value={essay}
+      onChange={(e) => setEssay(e.target.value)}
+      rows={12}
+      style={{
+        display: "block",
+        marginTop: 4,
+        width: "100%",
+        padding: "4px 6px",
+        boxSizing: "border-box",
+        border: "1px solid #ccc",
+        height: "315px",
+        resize: "vertical",
+      }}
+      placeholder="Espaço para digitar ou colar a sua redação."
+    />
+  </label>
 
-          <label style={{ fontSize: 14, flex: "1 1 520px", minWidth: 320 }}>
-            <b>4) Redação:</b>
-            <textarea
-              value={essay}
-              onChange={(e) => setEssay(e.target.value)}
-              rows={12}
-              style={{
-                display: "block",
-                marginTop: 4,
-                width: "100%",
-                padding: "4px 6px",
-                boxSizing: "border-box",
-                border: "1px solid #ccc",
-                height: "315px",   // altura aproximada da caixa de transcrição
-                resize: "vertical",
-              }}
-              placeholder="Espaço para digitar ou colar a sua redação."
-            />
-          </label>
-
+  {/* Wrapper só para posicionar à direita (SEM borda, sem pontilhado) */}
 <div
   style={{
-    flex: "0 1 380px",
-    minWidth: 300,
-    maxWidth: "100%",
-    borderRadius: 16,
+    // mantém à direita e “tamanho natural” (não estica)
+    alignSelf: "start",
+    height: "fit-content",
+    boxSizing: "border-box",
+
+    // alinhamento visual com o topo do textarea (por causa do "4) Redação:")
+    marginTop: 22,
+
+    // duplo pontilhado SEM criar “vazio” enorme
+    borderRadius: 18,
     border: "2px dashed #1b3333ff",
-    padding: 10,
+    outlineOffset: "-10px",
+
+    // espaço interno
+    padding: 12,
+
+    // fundo e texto
     background: "rgba(47,79,79,0.05)",
     fontSize: 12,
-    alignSelf: "stretch",
   }}
 >
-
-           <N8nTranscriber setRedacaoText={setEssay} />
-          </div>
-        </div>
-
-        
+  <N8nTranscriber setRedacaoText={setEssay} />
+</div>
+</div>        
 
 
 {/* Passo 5: Botão avaliar --------------------------------------- */}

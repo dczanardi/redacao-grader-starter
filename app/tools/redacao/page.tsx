@@ -42,6 +42,7 @@ export default function Redacao() {
   const [allowedToShare, setAllowedToShare] = useState<boolean | null>(null);
   const [consentError, setConsentError] = useState<string | null>(null);
   const [creditsRedacao, setCreditsRedacao] = useState<number | null>(null);
+  const [creditsTranscricao, setCreditsTranscricao] = useState<number | null>(null);
 const [meLoading, setMeLoading] = useState(true);
 const [isNarrow, setIsNarrow] = useState(false);
 useEffect(() => {
@@ -54,6 +55,8 @@ useEffect(() => {
 
       const redacaoCredits = data?.credits?.redacao;
       if (typeof redacaoCredits === "number") setCreditsRedacao(redacaoCredits);
+      const transcricaoCredits = data?.credits?.transcricao;
+      if (typeof transcricaoCredits === "number") setCreditsTranscricao(transcricaoCredits);
     }
 
     setMeLoading(false);
@@ -82,8 +85,15 @@ useEffect(() => {
 
 
 // --- créditos ---
-const creditsValue = typeof creditsRedacao === "number" ? creditsRedacao : 0;
-const hasCredits = creditsValue > 0;
+const redacaoValue = typeof creditsRedacao === "number" ? creditsRedacao : 0;
+const transcricaoValue = typeof creditsTranscricao === "number" ? creditsTranscricao : 0;
+
+const hasCreditsRedacao = redacaoValue > 0;
+const hasCreditsTranscricao = transcricaoValue > 0;
+
+// trava total só quando as duas cotas zerarem
+const lockAll = !meLoading && redacaoValue <= 0 && transcricaoValue <= 0;
+
 
 async function reloadCredits() {
   setMeLoading(true);
@@ -91,6 +101,9 @@ async function reloadCredits() {
     const me = await fetchMe();
     const c = me?.credits?.redacao;
     setCreditsRedacao(typeof c === "number" ? c : 0);
+    const t = me?.credits?.transcricao;
+    setCreditsTranscricao(typeof t === "number" ? t : 0);
+
   } finally {
     setMeLoading(false);
   }
@@ -162,8 +175,7 @@ async function startCheckout(qty: 1 | 3 | 5) {
     () => !!essay.trim() && !!rubric,
     [essay, rubric]
   );
-  const canSubmitFinal = canSubmit && hasCredits && !meLoading;
-
+  const canSubmitFinal = canSubmit && hasCreditsRedacao && !meLoading;
 
   // --------------------------------------------------
   // 2) Enviar redação para correção
@@ -297,6 +309,7 @@ return (
 >
   <button
     type="button"
+    disabled={lockAll}
     onClick={() => window.open("/reports", "_blank")}
     style={{
   width: "100%",
@@ -312,7 +325,9 @@ return (
   >
     Meus relatórios
   </button>
+  <div style={{ pointerEvents: lockAll ? "none" : "auto", opacity: lockAll ? 0.6 : 1 }}>
   <N8nHelpWidget />
+</div>
 
 {/* ✅ BOX CRÉDITOS + EMAIL (foi do miolo para a lateral) */}
 
@@ -354,6 +369,14 @@ return (
     {meLoading ? "carregando..." : (creditsRedacao ?? 0)}
   </span>
 </div>
+
+<div style={{ marginTop: 6, opacity: meLoading ? 0.7 : 1, fontWeight: 700 }}>
+  Créditos de transcrição:{" "}
+  <span style={{ fontWeight: 800 }}>
+    {meLoading ? "carregando..." : (creditsTranscricao ?? 0)}
+  </span>
+</div>
+
 
 {typeof creditsRedacao === "number" && creditsRedacao <= 0 && (
   <div
@@ -515,7 +538,11 @@ return (
     margin: 0,               // ✅ não centraliza com auto
     padding: 16,
     backgroundColor: "#eef4f7ff",
+    position: "relative",
+    overflow: "hidden",
     borderRadius: 12,
+    pointerEvents: lockAll ? "none" : "auto",
+    opacity: lockAll ? 0.55 : 1,
   }}
 >
 
@@ -809,7 +836,31 @@ return (
         : {}),
     }}
   >
-    <N8nTranscriber setRedacaoText={setEssay} />
+    {hasCreditsTranscricao ? (
+  <N8nTranscriber
+    setRedacaoText={setEssay}
+    onTranscribed={() => {
+      // baixa 1 só na tela (UI-only)
+      setCreditsTranscricao((prev) =>
+        typeof prev === "number" ? Math.max(prev - 1, 0) : 0
+      );
+    }}
+  />
+) : (
+  <div
+    style={{
+      padding: 12,
+      borderRadius: 12,
+      border: "1px solid #ccc",
+      background: "#fff",
+      fontSize: 13,
+      fontWeight: 700,
+    }}
+  >
+    Sem créditos de transcrição — compre créditos para transcrever.
+  </div>
+)}
+
   </div>
 </div>
 

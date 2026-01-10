@@ -2,9 +2,13 @@
 
 import React, { useMemo, useState } from "react";
 
+import type { Dispatch, SetStateAction } from "react";
+
 type Props = {
-  setRedacaoText: React.Dispatch<React.SetStateAction<string>>;
+  setRedacaoText: Dispatch<SetStateAction<string>>;
+  onTranscribed?: () => void;
 };
+
 
 function extractText(payload: string) {
   // 1) tenta JSON { text: "..." } ou { data: { text: "..." } } etc.
@@ -25,19 +29,28 @@ function extractText(payload: string) {
   return (payload || "").trim();
 }
 
-export default function N8nTranscriber({ setRedacaoText }: Props) {
+export default function N8nTranscriber({ setRedacaoText, onTranscribed }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [rawResponse, setRawResponse] = useState<string>("");
   const [text, setText] = useState<string>("");
   const [error, setError] = useState<string>("");
 
-  const canTranscribe = useMemo(() => !!file && !loading, [file, loading]);
+  const canTranscribe = useMemo(() => !!file && !loading && !text, [file, loading, text]);
 
-  async function handleTranscribe() {
-    setError("");
-    setText("");
-    setRawResponse("");
+ async function handleTranscribe() {
+  setError("");
+  setRawResponse("");
+
+  // Se já existe uma transcrição pronta, não permite transcrever de novo
+  // (evita "5 transcrições" com 1 crédito)
+  if (text && text.trim().length > 0) {
+    setError("Você já transcreveu 1 vez. Clique em “Inserir na Redação” para usar o texto.");
+    return;
+  }
+
+  setText("");
+
 
     if (!file) {
       setError("Selecione um arquivo (imagem ou PDF) para transcrever.");
@@ -79,7 +92,9 @@ export default function N8nTranscriber({ setRedacaoText }: Props) {
     if (!text) return;
 
     // Insere no campo principal da redação (sem digitar e-mail, sem popup)
-    setRedacaoText((prev) => {
+onTranscribed?.();
+
+setRedacaoText((prev: string) => {
   const prevStr = (prev || "");
   const prevTrim = prevStr.trim();
   const txtTrim = (text || "").trim();
@@ -92,8 +107,11 @@ export default function N8nTranscriber({ setRedacaoText }: Props) {
 
   return `${prevStr}\n\n${txtTrim}`;
 });
-
   }
+
+setText("");
+setFile(null);
+setRawResponse("");
 
   const boxStyle: React.CSSProperties = {
     border: "2px dashed #2b4c47",

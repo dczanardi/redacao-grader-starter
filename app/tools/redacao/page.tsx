@@ -216,7 +216,7 @@ if (res.status === 401) {
 
 // Sem crédito
 if (res.status === 402) {
-  alert("Sem créditos disponíveis. Compre créditos para avaliar.");
+  alert("Sem cotas de correção disponíveis. Compre créditos para liberar uma correção.");
   await reloadCredits();
   return;
 }
@@ -364,14 +364,14 @@ return (
 
 {/* Créditos disponíveis (sempre visível) */}
 <div style={{ opacity: meLoading ? 0.7 : 1, fontWeight: 700 }}>
-  Créditos disponíveis:{" "}
+  Cotas de correção:{" "}
   <span style={{ fontWeight: 800 }}>
     {meLoading ? "carregando..." : (creditsRedacao ?? 0)}
   </span>
 </div>
 
 <div style={{ marginTop: 6, opacity: meLoading ? 0.7 : 1, fontWeight: 700 }}>
-  Créditos de transcrição:{" "}
+  Cotas de transcrição:{" "}
   <span style={{ fontWeight: 800 }}>
     {meLoading ? "carregando..." : (creditsTranscricao ?? 0)}
   </span>
@@ -389,7 +389,7 @@ return (
     }}
   >
     <div style={{ marginBottom: 10, fontWeight: 600 }}>
-      Você está sem créditos para avaliar redações.
+      Você está sem cotas de correção.
     </div>
 
     <div
@@ -857,7 +857,7 @@ return (
       fontWeight: 700,
     }}
   >
-    Sem créditos de transcrição — compre créditos para transcrever.
+    Sem cotas de transcrição — compre créditos para transcrever.
   </div>
 )}
 
@@ -968,7 +968,7 @@ disabled={loading || meLoading || !canSubmitFinal}
     : meLoading
       ? "Carregando..."
       : (typeof creditsRedacao === "number" && creditsRedacao <= 0)
-        ? "Sem créditos — compre para avaliar"
+        ? "Sem cotas de correção — compre para avaliar"
         : "5) AVALIAR SUA REDAÇÃO"
 }
           </button>

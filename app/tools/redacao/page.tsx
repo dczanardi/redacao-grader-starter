@@ -28,23 +28,6 @@ type GradeResp = { ok?: boolean; report_html?: string; total?: number; error?: s
 
 
 export default function Redacao() {
-  async function comprarCreditos(qty: 1 | 3 | 5) {
-  const res = await fetch("/api/mp/create-preference", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ qty }),
-  });
-
-  const data = await res.json().catch(() => ({}));
-
-  const url = data?.url || data?.sandbox_init_point || data?.init_point;
-  if (!url) {
-    alert("Erro ao iniciar pagamento. Tente novamente.");
-    return;
-  }
-
-  window.location.href = url;
-}
 
   const [rubrics, setRubrics] = useState<string[]>([]);
   const [rubric, setRubric] = useState("");

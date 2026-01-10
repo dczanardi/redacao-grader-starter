@@ -1,37 +1,31 @@
-// app/api/mp/webhook/route.ts
+// /app/api/mp/webhook/route.ts
 import { NextResponse } from "next/server";
 import { addCredits } from "@/app/lib/credits";
-
-// --- DB (pg Pool) - singleton para evitar criar pool a cada request ---
-const globalForPg = globalThis as unknown as { pgPool?: Pool };
-
-function getPool() {
-  if (globalForPg.pgPool) return globalForPg.pgPool;
-
-  const connectionString =
-    process.env.PRISMA_DATABASE_URL ||
-    process.env.POSTGRES_URL ||
-    process.env.DATABASE_URL;
-
-  if (!connectionString) {
-    throw new Error("Missing database connection string (PRISMA_DATABASE_URL/POSTGRES_URL/DATABASE_URL).");
-  }
-
-  globalForPg.pgPool = new Pool({
-    connectionString,
-    // Prisma Postgres / serverless costuma exigir SSL
-    ssl: { rejectUnauthorized: false },
-    max: 1,
-  });
-
-  return globalForPg.pgPool;
-}
-
-// ✅ COLE AQUI A MESMA LINHA DE IMPORT DO `sql` QUE VOCÊ VIU EM app/lib/credits.ts
 import { Pool } from "pg";
 
+export const runtime = "nodejs";
+
+
+// 1) Pega a URL do Postgres (tenta várias, porque depende do setup)
+const DB_URL =
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_URL ||
+  process.env.POSTGRES_PRISMA_URL;
+
+const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+
+// 2) Reaproveita pool entre execuções (evita abrir conexão toda hora)
+const globalForPg = globalThis as unknown as { mpPool?: Pool };
+const pool =
+  globalForPg.mpPool ??
+  new Pool({
+    connectionString: DB_URL,
+  });
+
+if (process.env.NODE_ENV !== "production") globalForPg.mpPool = pool;
+
+// 3) Cria a tabela de trava automaticamente (sem Prisma / sem SQL manual)
 async function ensureMpTable() {
-  const pool = getPool();
   await pool.query(`
     CREATE TABLE IF NOT EXISTS mp_processed_payments (
       payment_id TEXT PRIMARY KEY,
@@ -40,95 +34,95 @@ async function ensureMpTable() {
   `);
 }
 
-async function markAsProcessed(paymentId: string) {
-  const pool = getPool();
+// 4) Marca pagamento como “processado” (idempotência)
+// Retorna true se foi a primeira vez; false se já existia.
+async function markAsProcessed(paymentId: string): Promise<boolean> {
   const r = await pool.query(
     `
     INSERT INTO mp_processed_payments (payment_id)
     VALUES ($1)
-    ON CONFLICT (payment_id) DO NOTHING
-    RETURNING payment_id;
-    `,
+    ON CONFLICT (payment_id) DO NOTHING;
+  `,
     [paymentId]
   );
-
-  // se não retornou nada, é porque já tinha sido processado
   return r.rowCount === 1;
 }
 
+async function fetchMpJson(url: string) {
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json().catch(() => null);
+  return { res, data };
+}
+
+async function processPaymentId(paymentId: string) {
+  // Busca detalhes do pagamento
+  const { res: payRes, data: pay } = await fetchMpJson(
+    `https://api.mercadopago.com/v1/payments/${paymentId}`
+  );
+  if (!payRes.ok || !pay) return;
+
+  // Só credita quando aprovado
+  if (pay.status !== "approved") return;
+
+  // Trava: se já processou esse paymentId, não faz nada
+  const firstTime = await markAsProcessed(paymentId);
+  if (!firstTime) return;
+
+  const md = pay.metadata || {};
+  const email = String(md.email || "").toLowerCase().trim();
+  const qty = Number(md.qty || 1);
+
+  if (!email || !Number.isFinite(qty) || qty <= 0) return;
+
+  // Você está creditando 2 produtos por compra (redacao + transcricao).
+  // Se isso for intencional, mantém assim.
+  await addCredits(email, "redacao", qty);
+  await addCredits(email, "transcricao", qty);
+}
+
 export async function POST(req: Request) {
-  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
   if (!token) return NextResponse.json({ ok: false }, { status: 500 });
+  if (!DB_URL) return NextResponse.json({ ok: false }, { status: 500 });
 
   const url = new URL(req.url);
+  const topic = url.searchParams.get("topic") || url.searchParams.get("type");
 
-  // MP pode mandar "type" ou "topic"
-  const type = url.searchParams.get("type") || url.searchParams.get("topic") || "";
-
-  // MP manda ids em formatos diferentes
   const dataId =
     url.searchParams.get("data.id") ||
     url.searchParams.get("id") ||
-    url.searchParams.get("payment_id") ||
-    "";
+    url.searchParams.get("payment_id");
 
-  // sempre responde rápido
+  // Sempre responde 200 rápido para o MP não “martelar”
   if (!dataId) return NextResponse.json({ ok: true });
 
   try {
-    // garante tabela (1x, e nas próximas é instantâneo)
     await ensureMpTable();
 
-    let paymentIds: string[] = [];
+    // Se veio merchant_order, precisamos converter para paymentId
+    if (topic === "merchant_order") {
+      const { res: moRes, data: mo } = await fetchMpJson(
+        `https://api.mercadopago.com/merchant_orders/${dataId}`
+      );
+      if (!moRes.ok || !mo) return NextResponse.json({ ok: true });
 
-    // 1) Se veio como payment, o id já é do pagamento
-    if (type === "payment") {
-      paymentIds = [String(dataId)];
+      const payments = Array.isArray(mo.payments) ? mo.payments : [];
+
+      // Processa só os payments aprovados (se tiver mais de um, processa todos)
+  for (const p of payments) {
+  const pid = String(p?.id || "");
+  if (pid) {
+    await processPaymentId(pid);
+  }
+}
+
+
+      return NextResponse.json({ ok: true });
     }
 
-    // 2) Se veio como merchant_order, precisamos buscar quais pagamentos estão dentro dela
-    if (type === "merchant_order") {
-      const moRes = await fetch(`https://api.mercadopago.com/merchant_orders/${dataId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const mo = await moRes.json().catch(() => null);
-
-      const ids =
-        mo?.payments?.map((p: any) => String(p?.id || "")).filter((x: string) => !!x) || [];
-
-      paymentIds = ids;
-    }
-
-    // Se não reconheceu o type, não faz nada (evita crédito errado)
-    if (paymentIds.length === 0) return NextResponse.json({ ok: true });
-
-    // Processa cada payment id (com trava anti-duplicação)
-    for (const pid of paymentIds) {
-      // trava: se já processou esse payment id, não credita de novo
-      const firstTime = await markAsProcessed(pid);
-      if (!firstTime) continue;
-
-      // busca detalhes do pagamento
-      const payRes = await fetch(`https://api.mercadopago.com/v1/payments/${pid}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const pay = await payRes.json().catch(() => null);
-
-      if (!payRes.ok || !pay) continue;
-
-      // só credita se aprovado
-      if (pay.status !== "approved") continue;
-
-      const md = pay.metadata || {};
-      const email = String(md.email || "").toLowerCase().trim();
-      const qty = Number(md.qty || 1);
-
-      if (!email || !Number.isFinite(qty) || qty <= 0) continue;
-
-      // 1 crédito = 1 redação + 1 transcrição (sempre junto)
-      await addCredits(email, "redacao", qty);
-      await addCredits(email, "transcricao", qty);
-    }
+    // Caso contrário, trata como payment
+    await processPaymentId(String(dataId));
 
     return NextResponse.json({ ok: true });
   } catch {

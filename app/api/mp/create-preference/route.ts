@@ -31,7 +31,8 @@ export async function POST(req: Request) {
 
     // quantidade (1,3,5)
     const body = await req.json().catch(() => ({}));
-    const qty = Number(body?.qty || 1);
+    const qtyRaw = Number(body?.qty);
+    const qty = Number.isFinite(qtyRaw) && qtyRaw > 0 ? qtyRaw : 1;
     if (![1, 3, 5].includes(qty)) {
       return NextResponse.json(
         { error: "qty inválido. Use 1, 3 ou 5." },

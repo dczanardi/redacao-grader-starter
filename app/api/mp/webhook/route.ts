@@ -40,7 +40,9 @@ export async function POST(req: Request) {
     }
 
     // creditar no banco
-    await addCredits(email, product, qty);
+    await addCredits(email, "redacao", qty);
+    await addCredits(email, "transcricao", qty);
+
 
     return NextResponse.json({ ok: true });
   } catch {

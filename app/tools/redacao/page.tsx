@@ -91,9 +91,6 @@ const transcricaoValue = typeof creditsTranscricao === "number" ? creditsTranscr
 const hasCreditsRedacao = redacaoValue > 0;
 const hasCreditsTranscricao = transcricaoValue > 0;
 
-// trava total só quando as duas cotas zerarem
-const lockAll = !meLoading && redacaoValue <= 0 && transcricaoValue <= 0;
-
 
 async function reloadCredits() {
   setMeLoading(true);
@@ -309,7 +306,7 @@ return (
 >
   <button
     type="button"
-    disabled={lockAll}
+    disabled={meLoading}
     onClick={() => window.open("/reports", "_blank")}
     style={{
   width: "100%",
@@ -325,7 +322,7 @@ return (
   >
     Meus relatórios
   </button>
-  <div style={{ pointerEvents: lockAll ? "none" : "auto", opacity: lockAll ? 0.6 : 1 }}>
+  <div>
   <N8nHelpWidget />
 </div>
 
@@ -541,8 +538,6 @@ return (
     position: "relative",
     overflow: "hidden",
     borderRadius: 12,
-    pointerEvents: lockAll ? "none" : "auto",
-    opacity: lockAll ? 0.55 : 1,
   }}
 >
 
@@ -836,30 +831,16 @@ return (
         : {}),
     }}
   >
-    {hasCreditsTranscricao ? (
-  <N8nTranscriber
-    setRedacaoText={setEssay}
-    onTranscribed={() => {
-      // baixa 1 só na tela (UI-only)
-      setCreditsTranscricao((prev) =>
-        typeof prev === "number" ? Math.max(prev - 1, 0) : 0
-      );
-    }}
-  />
-) : (
-  <div
-    style={{
-      padding: 12,
-      borderRadius: 12,
-      border: "1px solid #ccc",
-      background: "#fff",
-      fontSize: 13,
-      fontWeight: 700,
-    }}
-  >
-    Sem cotas de transcrição — compre créditos para transcrever.
-  </div>
-)}
+   <N8nTranscriber
+  disabled={meLoading || !hasCreditsTranscricao}
+  setRedacaoText={setEssay}
+  onTranscribed={() => {
+    // baixa 1 só na tela (UI-only)
+    setCreditsTranscricao((prev) =>
+      typeof prev === "number" ? Math.max(prev - 1, 0) : 0
+    );
+  }}
+/>
 
   </div>
 </div>

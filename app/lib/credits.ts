@@ -1,8 +1,13 @@
 // /app/lib/credits.ts
 import { Pool } from "pg";
 
+const DB_URL =
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_URL ||
+  process.env.POSTGRES_PRISMA_URL;
+
 const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL,
+  connectionString: DB_URL,
 });
 
 // Lê quantos créditos restam
@@ -14,7 +19,9 @@ export async function getCreditsRemaining(email: string, product: string): Promi
     [email, product]
   );
 
-  return rows[0]?.credits_remaining ?? 0;
+  const raw = rows[0]?.credits_remaining;
+const n = typeof raw === "number" ? raw : Number(raw);
+return Number.isFinite(n) ? n : 0;
 }
 
 // Debita 1 crédito de forma atômica (evita corrida)
@@ -60,5 +67,7 @@ export async function addCredits(email: string, product: string, amount: number)
     [email, product, amount]
   );
 
-  return rows[0]?.credits_remaining ?? 0;
+const raw = rows[0]?.credits_remaining;
+const n = typeof raw === "number" ? raw : Number(raw);
+return Number.isFinite(n) ? n : 0;
 }

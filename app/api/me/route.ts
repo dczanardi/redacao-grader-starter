@@ -25,10 +25,14 @@ const email = payload.e;
 const adminRaw = process.env.ADMIN_EMAILS || "";
 const isAdmin = splitEmails(adminRaw).includes(String(email || "").toLowerCase());
 
-const products =
+const payloadProducts =
   Array.isArray(payload.products) && payload.products.length
     ? payload.products
-    : ["redacao"];
+    : [];
+
+// Sempre expõe estes dois na UI:
+const products = Array.from(new Set([...payloadProducts, "redacao", "transcricao"]));
+
 
 // Busca créditos de cada produto (ex.: "redacao")
 const creditsByProduct = Object.fromEntries(

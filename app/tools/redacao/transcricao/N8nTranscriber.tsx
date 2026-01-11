@@ -7,6 +7,7 @@ import type { Dispatch, SetStateAction } from "react";
 type Props = {
   setRedacaoText: Dispatch<SetStateAction<string>>;
   onTranscribed?: () => void;
+  disabled?: boolean; // ✅ novo
 };
 
 
@@ -29,18 +30,23 @@ function extractText(payload: string) {
   return (payload || "").trim();
 }
 
-export default function N8nTranscriber({ setRedacaoText, onTranscribed }: Props) {
+export default function N8nTranscriber({ setRedacaoText, onTranscribed, disabled }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [rawResponse, setRawResponse] = useState<string>("");
   const [text, setText] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const transcribeDisabled = !!disabled;
 
   const canTranscribe = useMemo(() => !!file && !loading && !text, [file, loading, text]);
 
  async function handleTranscribe() {
   setError("");
   setRawResponse("");
+  if (transcribeDisabled) {
+  setError("Sem cotas de transcrição — compre créditos para transcrever.");
+  return;
+}
 
   // Se já existe uma transcrição pronta, não permite transcrever de novo
   // (evita "5 transcrições" com 1 crédito)
@@ -118,6 +124,8 @@ setRawResponse("");
     borderRadius: 16,
     padding: 16,
     background: "#f3f6f6",
+    opacity: transcribeDisabled ? 0.55 : 1,
+    transition: "opacity 120ms ease",
   };
 
   const titleStyle: React.CSSProperties = {
@@ -194,13 +202,19 @@ setRawResponse("");
       <input
         type="file"
         accept="image/*,.pdf"
+        disabled={transcribeDisabled || loading}
         onChange={(e) => setFile(e.target.files?.[0] || null)}
         style={{ width: "100%", marginBottom: 10 }}
       />
 
-      <button onClick={handleTranscribe} style={btnStyle} disabled={!canTranscribe}>
-        {loading ? "Carregando..." : "Transcrever Redação"}
-      </button>
+<button
+  onClick={handleTranscribe}
+  style={btnStyle}
+  disabled={transcribeDisabled || !canTranscribe}
+>
+  {transcribeDisabled ? "Sem cotas de transcrição" : loading ? "Carregando..." : "Transcrever Redação"}
+</button>
+
 
       <button onClick={handleInsert} style={btnInsertStyle} disabled={!text}>
         ⬇️ Inserir na Redação

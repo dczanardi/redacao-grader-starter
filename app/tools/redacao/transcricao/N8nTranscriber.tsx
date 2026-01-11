@@ -69,7 +69,7 @@ export default function N8nTranscriber({ setRedacaoText, onTranscribed, disabled
       form.append("file", file, file.name);
 
       // Chamada DIRETA ao webhook do n8n (embed sem popup)
-      const res = await fetch("https://dczanardi.app.n8n.cloud/webhook/corretor-redacao", {
+      const res = await fetch("/api/transcricao", {
         method: "POST",
         body: form,
       });

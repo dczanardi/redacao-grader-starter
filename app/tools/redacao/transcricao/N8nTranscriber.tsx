@@ -113,11 +113,12 @@ setRedacaoText((prev: string) => {
 
   return `${prevStr}\n\n${txtTrim}`;
 });
+    // ✅ limpa o transcritor depois de inserir o texto na redação
+    setText("");
+    setFile(null);
+    setRawResponse("");
+    setError("");
   }
-
-setText("");
-setFile(null);
-setRawResponse("");
 
   const boxStyle: React.CSSProperties = {
     border: "2px dashed #2b4c47",

@@ -250,7 +250,7 @@ async function callModelStrict({ rubric, proposalText, proposalImageDataUrl, ess
   messages.push({ role: "user", content: `TEXTO DO ALUNO (final):\n"""${essayText}"""` });
 
   const req: any = {
-    model: process.env.ESSAY_MODEL || process.env.OCR_MODEL_PRIMARY || "gpt-5",
+    model: process.env.ESSAY_MODEL || process.env.OCR_MODEL_PRIMARY || "gpt-5.4",
     messages,
     response_format: { type: "json_object" }
   };
@@ -524,7 +524,7 @@ export async function POST(req: Request) {
     if (!essayText) throw new Error("Cole o texto da redação (campo obrigatório).");
 
     // ====== CACHE DEV ======
-    const modelUsed = process.env.ESSAY_MODEL || process.env.OCR_MODEL_PRIMARY || "gpt-5";
+    const modelUsed = process.env.ESSAY_MODEL || process.env.OCR_MODEL_PRIMARY || "gpt-5.4";
 
     const payloadForHash = {
       rubric,

@@ -1,77 +1,80 @@
 {
-  "name": "FUVEST (oficial — 4 quesitos, pesos 3-2-3-2)",
+  "id": "FUVEST_REDACAO_OFICIAL_2026",
+  "name": "FUVEST — Redação Oficial 2026 (0–10)",
   "institution": "FUVEST",
-  "version": "2025-11-20",
-  "source_type": "oficial",
-  "source_pdf": "rubrics_oficiais/fontes/FUVEST/FUVEST_2025.pdf",
-  "scale": 100,
-
+  "genre": "Texto dissertativo-argumentativo",
+  "scale": 10,
+  "repertoire_required": false,
+  "levels_mapping": {
+    "4": "100% (Aprimorado)",
+    "3": "75% (Adequado)",
+    "2": "50% (Satisfatório)",
+    "1": "25% (Limitado)"
+  },
   "rules": [
     {
       "id": "nota_zero_condicoes",
-      "label": "Condições de nota zero (todas as propostas)",
-      "criterion_ids": ["C1", "C2", "C3", "C4"],
-      "type": "cap_level",
-      "max_level": 0,
-      "when": "Não desenvolvimento do tema proposto; não atendimento ao gênero ou tipo de texto solicitado; cópia integral da coletânea; qualquer forma de identificação do(a) candidato(a) no texto.",
+      "label": "Condições de nota zero",
+      "type": "essay_zero",
+      "when": "Aplicar nota 0 se houver: não atendimento ao tema e/ou à modalidade textual proposta; cópia dos textos da coletânea; explicitação de que não deseja ser avaliado; ou texto em branco. Nesses casos, a redação não passa pelos quatro critérios abaixo.",
       "explanation_required": true
     }
   ],
-
   "criteria": [
     {
       "id": "C1",
-      "name": "Desenvolvimento do tema, uso da coletânea e autoria (peso 3)",
-      "weight": 0.30,
+      "name": "Tema",
+      "weight": 0.3,
+      "weight_percent": 30,
+      "max_points": 3.0,
       "levels": {
-        "0": "Quase não desenvolve o tema; copia trechos da coletânea ou apenas a parafraseia; ausência de autoria.",
-        "1": "Desenvolvimento tangencial do tema; uso muito colado à coletânea; poucos sinais de autoria.",
-        "2": "Desenvolvimento ainda limitado, mas já se afasta parcialmente da coletânea; indícios discretos de autoria.",
-        "3": "Desenvolvimento razoável do tema; apropriação superficial porém correta da coletânea; mobiliza conhecimentos próprios.",
-        "4": "Bom desenvolvimento do tema; uso consistente da coletânea articulado a repertório próprio; autoria clara.",
-        "5": "Desenvolvimento excelente; leitura crítica da coletânea, uso autoral e criativo de referências; autoria muito marcada."
+        "4": "Valor: 3,0 pontos — Abordagem aprimorada do tema, com apropriação consistente da coletânea e mobilização de conhecimentos que demonstrem robustos indícios de autoria.",
+        "3": "Valor: 2,25 pontos — Abordagem adequada do tema, com utilização produtiva da coletânea e fortes indícios de autoria.",
+        "2": "Valor: 1,5 ponto — Observação razoável do tema, com paráfrase simples da coletânea e demonstração de alguma autoria.",
+        "1": "Valor: 0,75 ponto — Apenas tangencia a frase temática, não apresenta indícios consistentes de autoria e/ou há indicação de plágio."
       }
     },
     {
       "id": "C2",
-      "name": "Compreensão e atendimento ao gênero e tipo de texto (peso 2)",
-      "weight": 0.20,
+      "name": "Estrutura dissertativa",
+      "weight": 0.2,
+      "weight_percent": 20,
+      "max_points": 2.0,
       "levels": {
-        "0": "Configuração muito distante do gênero/tipo exigido; estrutura praticamente inadequada.",
-        "1": "Atendimento primário ao gênero e/ou tipo; marcas estruturais aparecem de forma frágil ou incompleta.",
-        "2": "Atendimento ainda irregular, mas reconhecível; alguns elementos do gênero/tipo são bem realizados, outros não.",
-        "3": "Atendimento razoável; gênero e tipo são identificáveis, com estrutura básica adequada.",
-        "4": "Atendimento bom ao gênero e ao tipo; estrutura composicional sólida e coerente com a proposta.",
-        "5": "Atendimento exemplar; domina o gênero e o tipo de texto, explorando com segurança seus recursos composicionais."
+        "4": "Valor: 2,0 pontos — Apresenta integralmente a estrutura dissertativa desejada: introdução com tese, desenvolvimento que a sustenta e fechamento adequado.",
+        "3": "Valor: 1,5 ponto — Texto adequado à modalidade dissertativa, embora lhe falte algum traço formal necessário.",
+        "2": "Valor: 1,0 ponto — Estrutura satisfatória, ainda que com traços de outras modalidades textuais.",
+        "1": "Valor: 0,5 ponto — Atende parcialmente à estrutura do gênero, ainda que com traços conflitantes de outros gêneros."
       }
     },
     {
       "id": "C3",
-      "name": "Recursos linguísticos, coesão e progressão textual (peso 3)",
-      "weight": 0.30,
+      "name": "Coesão, coerência e progressão argumentativa",
+      "weight": 0.3,
+      "weight_percent": 30,
+      "max_points": 3.0,
       "levels": {
-        "0": "Fragmentação forte; sequência de ideias pouco clara; muitos problemas de coesão e de organização global.",
-        "1": "Articulação razoável, mas com várias falhas na composição; progressão temática instável.",
-        "2": "Articulação mediana; já há início, meio e fim identificáveis, mas com quebras ou repetições excessivas.",
-        "3": "Boa articulação formal e de sentido; composição textual adequada, com progressão relativamente fluida.",
-        "4": "Articulação consistente; coesão bem construída entre parágrafos e ideias; progressão segura.",
-        "5": "Ótima articulação formal e de sentido; projeto de composição muito claro, com progressão sofisticada e bem planejada."
+        "4": "Valor: 3,0 pontos — Ótima articulação formal e de sentido, com emprego adequado dos recursos linguísticos e composição textual condizente com a progressão argumentativa.",
+        "3": "Valor: 2,25 pontos — Boa articulação de sentido, com aprimoramento da coerência.",
+        "2": "Valor: 1,5 ponto — Articulação satisfatória, com uso de poucos recursos de coesão e coerência.",
+        "1": "Valor: 0,75 ponto — Articulação apenas razoável, com muitas falhas na composição textual."
       }
     },
     {
       "id": "C4",
-      "name": "Convenções da escrita e adequação vocabular (peso 2)",
-      "weight": 0.20,
+      "name": "Correção gramatical, convenção da escrita e adequação vocabular",
+      "weight": 0.2,
+      "weight_percent": 20,
+      "max_points": 2.0,
       "levels": {
-        "0": "Muitos desvios graves de norma-padrão e vocabulário pouco adequado, comprometendo a compreensão.",
-        "1": "Rompe com frequência convenções da escrita, mas revela algum domínio da norma-padrão e dos recursos gramaticais.",
-        "2": "Rompe ocasionalmente convenções da escrita; domínio globalmente bom da norma-padrão e do vocabulário.",
-        "3": "Rompe poucas vezes convenções da escrita; domínio muito bom da norma-padrão e da seleção vocabular.",
-        "4": "Raros deslizes; domínio sólido das convenções de escrita e uso preciso do vocabulário.",
-        "5": "Uso exemplar da norma-padrão e do vocabulário; altíssima correção e precisão expressiva sem soar artificial."
+        "4": "Valor: 2,0 pontos — Rompe mínima e pontualmente as convenções da escrita e apresenta ótimo domínio da norma-padrão gramatical e do vocabulário.",
+        "3": "Valor: 1,5 ponto — Rompe raramente as convenções da escrita e apresenta bom domínio da norma-padrão e do vocabulário.",
+        "2": "Valor: 1,0 ponto — Rompe algumas vezes as convenções da escrita e apresenta domínio satisfatório da norma-padrão e do vocabulário.",
+        "1": "Valor: 0,5 ponto — Rompe frequentemente as convenções da escrita e possui domínio elementar da norma-padrão e do vocabulário."
       }
     }
   ],
-
-  "notes": "Baseado na matriz oficial de critérios para redação FUVEST (Simulado 2025), com pesos 3-2-3-2 e adaptação para escala de 0 a 5 níveis por quesito a fim de permitir maior nuance na correção automática."
+  "source_document": {
+    "filename": "RED FUVEST OFICIAL 26.docx"
+  }
 }

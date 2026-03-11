@@ -1,88 +1,119 @@
 {
-  "name": "ENEM (oficial — 5 competências)",
+  "id": "ENEM_REDACAO_OFICIAL_2026",
+  "name": "ENEM — Redação Oficial 2026 (0–1000)",
   "institution": "ENEM",
-  "version": "2025-09-08",
-  "source_type": "oficial",
-  "source_pdf": "rubrics_oficiais/fontes/ENEM/ENEM_2024.pdf",
+  "genre": "Texto dissertativo-argumentativo",
   "scale": 1000,
-
+  "repertoire_required": true,
+  "levels_mapping": {
+    "5": "100% (200 pontos / nível 5)",
+    "4": "80% (160 pontos / nível 4)",
+    "3": "60% (120 pontos / nível 3)",
+    "2": "40% (80 pontos / nível 2)",
+    "1": "20% (40 pontos / nível 1)",
+    "0": "0% (0 ponto / nível 0)"
+  },
   "rules": [
     {
       "id": "nota_zero_condicoes",
-      "label": "Condições de nota zero",
-      "criterion_ids": ["C1", "C2", "C3", "C4", "C5"],
-      "type": "cap_level",
-      "max_level": 0,
-      "when": "Texto em branco; fuga total ao tema; gênero/formato inadequado (não dissertativo-argumentativo); cópia extensa da coletânea ou de outra fonte (mais de 3 linhas); impropérios; desrespeito aos direitos humanos (anulação segundo cartilha).",
+      "label": "Condições de nota zero da redação",
+      "type": "essay_zero",
+      "when": "Aplicar nota 0 na redação se houver: texto insuficiente (até 7 linhas); fuga ao tema; não atendimento ao tipo dissertativo-argumentativo; parte deliberadamente desconectada do tema; impropérios, desenhos ou outras formas propositais de anulação; identificação do participante fora do local apropriado.",
       "explanation_required": true
+    },
+    {
+      "id": "tangenciamento_teto_c3_c5",
+      "label": "Teto em C3 e C5 por tangenciamento",
+      "type": "operational_note",
+      "when": "Se a redação tangenciar o tema na Competência II, as Competências III e V não devem ultrapassar 40 pontos (nível 1).",
+      "explanation_required": false
+    },
+    {
+      "id": "direitos_humanos_c5",
+      "label": "Direitos humanos na Competência V",
+      "type": "operational_note",
+      "when": "Proposta de intervenção que desrespeita os direitos humanos recebe 0 na Competência V.",
+      "explanation_required": false
     }
   ],
-
   "criteria": [
     {
       "id": "C1",
-      "name": "Competência I — Demonstrar domínio da norma-padrão da língua escrita",
-      "weight": 0.20,
+      "name": "Competência I — Demonstrar domínio da modalidade escrita formal da língua portuguesa",
+      "weight": 0.2,
+      "weight_percent": 20,
+      "max_points": 200,
       "levels": {
-        "0": "Graves inadequações de registro e múltiplos desvios que comprometem a compreensão.",
-        "1": "Muitos desvios (ortografia, acentuação, concordância, regência, pontuação) e marcas de oralidade.",
-        "2": "Alguns desvios recorrentes; interferências pontuais na clareza; vocabulário limitado.",
-        "3": "Poucos desvios; registro globalmente adequado; vocabulário apropriado.",
-        "4": "Raros deslizes; boa precisão sintática, ortográfica e lexical; coesão frasal consistente.",
-        "5": "Domínio excelente do padrão escrito; clareza, precisão e propriedade estilística."
+        "5": "Valor: 200 pontos — Estrutura sintática excelente, com no máximo uma falha, e no máximo dois desvios.",
+        "4": "Valor: 160 pontos — Estrutura sintática boa e poucos desvios.",
+        "3": "Valor: 120 pontos — Estrutura sintática regular e alguns desvios.",
+        "2": "Valor: 80 pontos — Estrutura sintática deficitária ou muitos desvios.",
+        "1": "Valor: 40 pontos — Estrutura sintática deficitária com muitos desvios.",
+        "0": "Valor: 0 ponto — Estrutura sintática inexistente, independentemente da quantidade de desvios."
       }
     },
     {
       "id": "C2",
-      "name": "Competência II — Compreender a proposta e aplicar conceitos de áreas do conhecimento",
-      "weight": 0.20,
+      "name": "Competência II — Compreender a proposta e aplicar conceitos das várias áreas de conhecimento para desenvolver o tema dentro dos limites estruturais do texto dissertativo-argumentativo em prosa",
+      "weight": 0.2,
+      "weight_percent": 20,
+      "max_points": 200,
       "levels": {
-        "0": "Fuga total ao tema ou não realização da proposta.",
-        "1": "Atendimento muito parcial; foco frágil; mobilização conceitual incipiente.",
-        "2": "Compreensão básica do tema; aplicação simples de conceitos; referências genéricas (senso comum).",
-        "3": "Boa compreensão do tema; mobiliza conceitos pertinentes; inicia repertório sociocultural identificável e relacionado.",
-        "4": "Excelente compreensão; articula conceitos de modo consistente; repertório sociocultural relevante e integrado.",
-        "5": "Compreensão exemplar; recorte preciso e aprofundado; repertório variado e preciso, articulado com sofisticação."
+        "5": "Valor: 200 pontos — Abordagem completa do tema, com 3 partes do texto, nenhuma delas embrionária, e repertório legitimado e pertinente ao tema, com uso produtivo.",
+        "4": "Valor: 160 pontos — Abordagem completa do tema, com 3 partes do texto, nenhuma delas embrionária, e repertório legitimado e pertinente ao tema, sem uso produtivo.",
+        "3": "Valor: 120 pontos — Abordagem completa do tema, com 3 partes do texto, admitindo-se 1 parte embrionária, e repertório baseado nos textos motivadores e/ou não legitimado e/ou legitimado, mas não pertinente ao tema. Redações com corpo do texto de até 8 linhas em que não seja possível reconhecer as 3 partes não devem ultrapassar este nível.",
+        "2": "Valor: 80 pontos — Abordagem completa do tema, com 3 partes do texto, sendo 2 delas embrionárias, ou conclusão finalizada por frase incompleta. Redações com muitos trechos de cópia não devem ultrapassar este nível.",
+        "1": "Valor: 40 pontos — Tangencia o tema, ou apresenta aglomerado caótico de palavras, ou traços constantes de outros tipos textuais.",
+        "0": "Valor: 0 ponto — Fuga ao tema ou não atendimento ao tipo dissertativo-argumentativo."
       }
     },
     {
       "id": "C3",
-      "name": "Competência III — Selecionar, relacionar, organizar e interpretar informações/argumentos",
-      "weight": 0.20,
+      "name": "Competência III — Selecionar, relacionar, organizar e interpretar informações, fatos, opiniões e argumentos em defesa de um ponto de vista",
+      "weight": 0.2,
+      "weight_percent": 20,
+      "max_points": 200,
       "levels": {
-        "0": "Fragmentação; contradições; ausência de progressão argumentativa.",
-        "1": "Encadeamento precário; justificativas frágeis; exemplos genéricos.",
-        "2": "Seleção e organização básicas; argumentos previsíveis; referências pouco desenvolvidas.",
-        "3": "Boa seleção e organização; argumentos pertinentes; ao menos um apoio (dado/autoridade/fato) relacionado e comentado.",
-        "4": "Argumentação consistente; múltiplos apoios articulados ao raciocínio; relação clara entre ideias e evidências.",
-        "5": "Argumentação densa e crítica; integração refinada de informações e pontos de vista; sofisticação na análise."
+        "5": "Valor: 200 pontos — Projeto de texto estratégico e desenvolvimento de informações, fatos e opiniões em todo o texto. Admitem-se deslizes pontuais de projeto e/ou de desenvolvimento.",
+        "4": "Valor: 160 pontos — Projeto de texto com poucas falhas e desenvolvimento de informações, fatos e opiniões com poucas lacunas.",
+        "3": "Valor: 120 pontos — Projeto de texto com algumas falhas e desenvolvimento de informações, fatos e opiniões com algumas lacunas.",
+        "2": "Valor: 80 pontos — Projeto de texto com muitas falhas e sem desenvolvimento, ou com desenvolvimento de apenas uma informação, fato ou opinião. Textos com contradição grave não devem ultrapassar este nível.",
+        "1": "Valor: 40 pontos — Projeto de texto sem foco temático ou com foco temático distorcido. Textos tangentes não devem ultrapassar este nível.",
+        "0": "Valor: 0 ponto — Aglomerado caótico de palavras, independentemente da abordagem do tema."
       }
     },
     {
       "id": "C4",
-      "name": "Competência IV — Demonstrar conhecimento dos mecanismos linguísticos de coesão",
-      "weight": 0.20,
+      "name": "Competência IV — Demonstrar conhecimento dos mecanismos linguísticos necessários para a construção da argumentação",
+      "weight": 0.2,
+      "weight_percent": 20,
+      "max_points": 200,
       "levels": {
-        "0": "Ausência de progressão; referenciação e sequenciação muito deficientes.",
-        "1": "Coesão frágil; conectores pouco adequados; retomadas imprecisas.",
-        "2": "Coesão básica; conectores funcionais; retomadas simples.",
-        "3": "Boa coesão; conectores e retomadas adequados; paragrafação funcional.",
-        "4": "Coesão consistente; articulação clara entre períodos e parágrafos; variedade de recursos coesivos.",
-        "5": "Coesão exemplar; encadeamento refinado; uso preciso e variado de mecanismos coesivos."
+        "5": "Valor: 200 pontos — Presença expressiva de elementos coesivos intra e interparágrafos, raras ou ausentes repetições e sem inadequação.",
+        "4": "Valor: 160 pontos — Presença constante de elementos coesivos intra e interparágrafos, ou poucas repetições, ou poucas inadequações.",
+        "3": "Valor: 120 pontos — Presença regular de elementos coesivos intra e/ou interparágrafos, ou algumas repetições, ou algumas inadequações.",
+        "2": "Valor: 80 pontos — Presença pontual de elementos coesivos intra e/ou interparágrafos, ou muitas repetições, ou muitas inadequações. Textos em monobloco não devem ultrapassar este nível.",
+        "1": "Valor: 40 pontos — Presença rara de elementos coesivos intra e/ou interparágrafos, e/ou excessivas repetições, e/ou excessivas inadequações.",
+        "0": "Valor: 0 ponto — Ausência de articulação: palavras e/ou períodos desconexos ao longo de todo o texto."
       }
     },
     {
       "id": "C5",
-      "name": "Competência V — Elaborar proposta de intervenção",
-      "weight": 0.20,
+      "name": "Competência V — Elaborar proposta de intervenção para o problema abordado, respeitando os direitos humanos",
+      "weight": 0.2,
+      "weight_percent": 20,
+      "max_points": 200,
       "levels": {
-        "0": "Ausência de proposta de intervenção ou proposta inviável/incoerente.",
-        "1": "Intervenção muito genérica; faltam elementos essenciais (agente, ação, meio, finalidade/efeito).",
-        "2": "Intervenção básica; presença parcial dos elementos; pouca viabilidade/pertinência.",
-        "3": "Intervenção adequada; inclui elementos centrais (agente/ação/meio/finalidade) com alguma viabilidade.",
-        "4": "Intervenção consistente; elementos completos e articulados ao problema; detalhamento inicial.",
-        "5": "Intervenção exemplar; elementos completos (agente, ação, meio/modo, finalidade/efeito e detalhamento); viável, ética e bem articulada ao diagnóstico."
+        "5": "Valor: 200 pontos — 5 elementos válidos.",
+        "4": "Valor: 160 pontos — 4 elementos válidos.",
+        "3": "Valor: 120 pontos — 3 elementos válidos.",
+        "2": "Valor: 80 pontos — 2 elementos válidos. Estruturas condicionais com 2 ou mais elementos válidos não devem ultrapassar este nível.",
+        "1": "Valor: 40 pontos — Tangenciamento do tema, ou apenas elemento(s) nulo(s), ou 1 elemento válido.",
+        "0": "Valor: 0 ponto — Ausência de proposta, ou proposta de intervenção que desrespeita os direitos humanos, ou proposta não relacionada sequer ao assunto."
       }
     }
-  ]
+  ],
+  "source_document": {
+    "filename": "RED ENEM OFICIAL 26.docx"
+  }
 }

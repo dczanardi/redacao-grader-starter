@@ -1,75 +1,83 @@
 {
-  "name": "UNICAMP — Redação (oficial — Pt, G, Lt, CeC 2026)",
+  "id": "UNICAMP_REDACAO_OFICIAL_2026",
+  "name": "UNICAMP — Redação Oficial 2026 (0–12)",
   "institution": "UNICAMP",
-  "version": "2026-01-01",
-  "source_type": "oficial_adaptado",
-  "source_pdf": "Diretrizes-de-Avaliacao-da-Redacao-site.pdf",
-  "scale": 100,
+  "genre": "Redação a partir de proposta de gênero textual da prova",
+  "scale": 12,
+  "repertoire_required": true,
+  "levels_mapping": {
+    "4": "Faixa 4",
+    "3": "Faixa 3",
+    "2": "Faixa 2",
+    "1": "Faixa 1",
+    "0": "Faixa 0"
+  },
 
   "rules": [
-    {
-      "id": "nota_zero_condicoes",
-      "label": "Condições de nota zero",
-      "criterion_ids": ["C1", "C2", "C3", "C4"],
-      "type": "cap_level",
-      "max_level": 0,
-      "when": "Texto em branco; fuga total à proposta temática; gênero/formato incompatível com o solicitado; texto predominantemente copiado dos textos motivadores ou de outra fonte.",
-      "explanation_required": true
-    }
-  ],
-
+  {
+    "id": "anulacao_redacao",
+    "label": "Condições de anulação da redação",
+    "criterion_ids": ["C1", "C2", "C3", "C4"],
+    "type": "cap_level",
+    "max_level": 0,
+    "when": "Aplicar nota 0 na redação inteira se houver: abordagem de outro tema que não o da proposta escolhida; não cumprimento nem da proposta temática nem do gênero solicitado; prevalência de cópias do enunciado e/ou do(s) texto(s) da prova.",
+    "explanation_required": true
+  }
+],
   "criteria": [
     {
       "id": "C1",
-      "name": "Proposta temática (Pt — atendimento ao tema e à tarefa)",
-      "weight": 0.17,
+      "name": "Proposta temática (Pt)",
+      "weight": 0.1667,
+      "weight_percent": 16.7,
+      "max_points": 2.0,
       "levels": {
-        "0": "Não realiza a proposta temática: fuga total ao tema ou tarefa não cumprida.",
-        "1": "Atende de forma muito parcial; foco pouco claro; aborda aspectos periféricos do tema.",
-        "2": "Atendimento básico; o tema é reconhecível, mas com recorte genérico ou pouco preciso.",
-        "3": "Boa realização da proposta temática; recorte pertinente e foco relativamente claro.",
-        "4": "Realização plena da proposta; recorte bem definido e consistente ao longo do texto.",
-        "5": "Tratamento exemplar da proposta temática; recorte preciso, pertinente e explorado de modo aprofundado."
+        "2": "Valor: 2,0 pontos — Cumpriu plenamente a proposta temática. O detalhamento depende da prova específica, mas há atendimento completo às tarefas e ao recorte temático solicitado.",
+        "1": "Valor: 1,0 ponto — Cumpriu parcialmente a proposta temática. O detalhamento depende da prova específica, mas há atendimento incompleto das tarefas e/ou do recorte temático.",
+        "0": "Valor: 0,0 ponto — Não cumpriu a proposta temática. O detalhamento depende da prova específica."
       }
     },
     {
       "id": "C2",
-      "name": "Gênero (G — atendimento ao gênero e à interlocução previstos)",
+      "name": "Gênero (G)",
       "weight": 0.25,
+      "weight_percent": 25,
+      "max_points": 3.0,
       "levels": {
-        "0": "Não atende ao gênero solicitado ou compromete totalmente a situação de interlocução.",
-        "1": "Marcas de gênero muito frágeis; elementos centrais do gênero pouco reconhecíveis.",
-        "2": "Gênero reconhecível, mas com lacunas importantes (estrutura, voz enunciativa, propósito comunicativo).",
-        "3": "Boa adequação ao gênero; estrutura compatível, voz enunciativa e interlocução atendidas.",
-        "4": "Adequação plena; escolhas discursivas consistentes com o gênero e o público-alvo.",
-        "5": "Domínio exemplar do gênero e da interlocução; utiliza recursos próprios do gênero com segurança e sofisticação."
+        "3": "Valor: 3,0 pontos — Desenvolve bem o gênero: de acordo com o projeto de texto, explora a construção composicional (C) e configura situação de produção (S) e interlocução (I).",
+        "2": "Valor: 2,0 pontos — Desenvolve o gênero: de acordo com o projeto de texto, configura a construção composicional (C) e configura S e/ou I.",
+        "1": "Valor: 1,0 ponto — Desenvolve mal o gênero: apresenta C, mas não S nem I, ou apresenta problemas em C, ainda que configure S e/ou I.",
+        "0": "Valor: 0,0 ponto — Não configura o gênero solicitado na proposta, ainda que configure S e/ou I."
       }
     },
     {
       "id": "C3",
-      "name": "Leitura do(s) texto(s) (Lt — uso dos textos motivadores e outras referências)",
+      "name": "Leitura do(s) texto(s) (Lt)",
       "weight": 0.25,
+      "weight_percent": 25,
+      "max_points": 3.0,
       "levels": {
-        "0": "Não estabelece relação significativa com os textos motivadores; leitura equivocada ou ausente.",
-        "1": "Relações superficiais; menções genéricas aos textos, sem integração ao ponto de vista do candidato.",
-        "2": "Leitura básica; identifica ideias dos textos, mas com pouca elaboração ou comentário próprio.",
-        "3": "Boa leitura; mobiliza adequadamente ideias dos textos motivadores e as relaciona ao ponto de vista.",
-        "4": "Leitura consistente; articula criticamente as ideias dos textos motivadores e de outros repertórios.",
-        "5": "Leitura exemplar; integra de forma crítica e autônoma os textos motivadores e outros repertórios, sustentando o ponto de vista com sofisticação."
+        "3": "Valor: 3,0 pontos — Uso produtivo do(s) texto(s): leitura crítica que caracteriza apropriação de acordo com o projeto de texto, ou compreensão global com inferências, e ausência de erros de leitura.",
+        "2": "Valor: 2,0 pontos — Uso adequado do(s) texto(s): leitura mediana que caracteriza aproveitamento de acordo com o projeto de texto, e compreensão global, ainda que com erro pontual que não comprometa o projeto de texto.",
+        "1": "Valor: 1,0 ponto — Uso inadequado do(s) texto(s): leitura superficial, e/ou erro(s) de leitura que comprometem o projeto de texto, e/ou uso do(s) texto(s) desvinculado de um projeto de texto.",
+        "0": "Valor: 0,0 ponto — Uso insuficiente do(s) texto(s), e/ou simples menções, ou simples paráfrase(s), ou uso restrito a cópia(s), ou não uso do(s) texto(s) da prova."
       }
     },
     {
       "id": "C4",
-      "name": "Convenções da escrita e coesão (CeC — correção e organização linguística)",
-      "weight": 0.33,
+      "name": "Articulação escrita (operacionalizada como Convenções da escrita e Coesão – CeC)",
+      "weight": 0.3333,
+      "weight_percent": 33.3,
+      "max_points": 4.0,
       "levels": {
-        "0": "Graves problemas de correção e organização; comprometem seriamente a compreensão global do texto.",
-        "1": "Muitos desvios de norma-padrão e coesão; períodos confusos; paragrafação precária.",
-        "2": "Alguns desvios recorrentes de grafia, concordância ou pontuação; coesão básica e às vezes truncada.",
-        "3": "Correção globalmente adequada; poucos desvios que não impedem a compreensão; coesão e paragrafação funcionais.",
-        "4": "Boa correção; raros deslizes; coesão consistente entre períodos e parágrafos; progressão clara.",
-        "5": "Domínio excelente das convenções da escrita e da coesão; texto claro, fluente e bem organizado, com uso preciso de recursos linguísticos."
+        "4": "Valor: 4,0 pontos — Escolhas lexicais e/ou sintáticas produtivas e recursos coesivos produtivos para o texto. Admitem-se erros eventuais.",
+        "3": "Valor: 3,0 pontos — Escolhas lexicais e/ou sintáticas adequadas e recursos coesivos adequados. Admitem-se erros. Quando houver escolhas lexicais e sintáticas produtivas, admitem-se erros variados.",
+        "2": "Valor: 2,0 pontos — Escolhas lexicais e/ou sintáticas simples, e/ou recursos coesivos simples, ou que comprometem pontualmente o texto, e/ou erros variados ou recorrentes.",
+        "1": "Valor: 1,0 ponto — Escolhas lexicais e/ou sintáticas inadequadas, e/ou recursos coesivos inadequados, ou que comprometem globalmente o texto, e/ou erros variados e recorrentes, ou prevalência de simples paráfrase(s) do(s) texto(s) da prova."
       }
     }
-  ]
+  ],
+  "source_document": {
+    "filename": "RED UNICAMP OFICIAL 26.docx"
+  }
 }
